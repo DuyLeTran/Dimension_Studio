@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<style>
+    .homepage-img {
+        max-height: 10%;
+        width: 80%;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>    
+
+<div class="container mt-4">
+    <h1 class="display-4" style="font-size: 3.5rem; font-weight: 600; line-height: 1.2;">Virtual Try-Ons. Real Results.</h1>
+    <p class="lead">Empowering fashion by boosting confidence, cutting returns, and elevating online shopping.</p>
+    <a href="#" class="btn btn-dark btn-lg">Get Started</a>
+    <div style="padding: 10px;">
+        <img src="/media/clothes_homepage_1.png" alt="Home" class="img-fluid homepage-img">
+    </div>
+    <h2 class="display-7" style="font-size: 2.5rem; font-weight: 600; line-height: 1.2;">Experience the Future of Fitting.</h2>
+    <div style="padding: 10px;">
+        <img src="/media/clothes_homepage_2.png" alt="Home" class="img-fluid homepage-img">
+    </div>
+
+    <div class="py-5">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6 mb-4 mb-md-0" style="margin-top: 20px;">
+                <h1 class="fw-bold mb-4">Unlock Growth</h1>
+                <div class="mb-5">
+                    <p class="fw-bold mb-1">Reduce returns by 40%</p>
+                    <p class="text-muted">Keep more revenue in your pocket</p>
+                </div>
+                <div class="mb-5">
+                    <p class="fw-bold mb-1">Increase conversion rates by 25%</p>
+                    <p class="text-muted">Turn clicks into loyal customers.</p>
+                </div>
+                <div class="mb-5">
+                    <p class="fw-bold mb-1">Integrate in 1 day with our API</p>
+                    <p class="text-muted">Launch seamlessly with no stress</p>
+                </div>
+                <a href="#" class="btn btn-dark btn-lg">Schedule a call</a>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6 text-end">
+                <img src="/media/clothes_homepage_3.png" alt="Retailer Demo" class="img-fluid" style="display: inline-block;">
+            </div>
+        </div>
+    </div>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="fw-bold mb-5">Our Partners</h2>
+            <div class="row g-4">
+                <!-- Card 1 -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <p class="fs-5 mb-4">“A terrific piece of technology”</p>
+                            <div class="d-flex align-items-center">
+                                <span class="rounded-circle bg-secondary d-flex justify-content-center align-items-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white" style="font-size: 2rem;"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-bold">Name</div>
+                                    <div class="text-muted small">Description</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 2 -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <p class="fs-5 mb-4">“Game changing”</p>
+                            <div class="d-flex align-items-center">
+                                <span class="rounded-circle bg-secondary d-flex justify-content-center align-items-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white" style="font-size: 2rem;"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-bold">Name</div>
+                                    <div class="text-muted small">Description</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Card 3 -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <p class="fs-5 mb-4">“Works like a charm”</p>
+                            <div class="d-flex align-items-center">
+                                <span class="rounded-circle bg-secondary d-flex justify-content-center align-items-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white" style="font-size: 2rem;"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-bold">Name</div>
+                                    <div class="text-muted small">Description</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

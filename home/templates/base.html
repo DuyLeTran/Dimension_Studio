@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dimension Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<style>
+    .form-switch.custom-switch {
+            padding-left: 3.5em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-switch.custom-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            margin-left: -3.5em;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+            background-position: left center;
+            border-radius: 2em;
+            transition: background-position .15s ease-in-out;
+        }
+
+        .form-switch.custom-switch .form-check-input:checked {
+            background-position: right center;
+            background-color: #0d6efd;
+        }
+
+        .form-switch.custom-switch .form-check-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            cursor: pointer;
+            white-space: nowrap;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-switch.custom-switch .form-check-label i {
+            font-size: 1.1em;
+        }
+
+        .toggle-text {
+            margin-left: 0.5rem;
+        }
+</style>
+<body>
+    <div class="d-flex flex-column min-vh-100">
+        <header class="py-3">
+            <div class="container d-flex flex-wrap align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'home:home' %}">
+                        <img src="/media/transparent.png" alt="Dimension Studio Logo" height="150">
+                    </a>
+                    {% if user.is_superuser %}
+                    <div class="form-check form-switch custom-switch" style="margin-bottom: 1rem;">
+                        <input class="form-check-input" type="checkbox" id="viewToggle" onchange="toggleView()">
+                        <label class="form-check-label" for="viewToggle" style="margin-top: 0.25rem; margin-left: 0.25rem;">
+                            <i class="fas fa-user-shield"></i>
+                            <span class="toggle-text">Admin View</span>
+                        </label>
+                    </div>
+                    {% endif %}
+                </div>
+                <ul class="nav justify-content-end gap-5">
+                    <li class="nav-item"><a href="{% url 'home:how_it_works' %}" class="nav-link px-2 link-dark">How It Works</a></li>
+                    <li class="nav-item"><a href="{% url 'home:pricing'%}" class="nav-link px-2 link-dark">Pricing</a></li>
+                    <li class="nav-item"><a href="#demo" class="nav-link px-2 link-dark">Demo</a></li>
+                    <li class="nav-item"><a href="{% url 'home:about_us'%}" class="nav-link px-2 link-dark">About Us</a></li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="btn btn-dark dropdown-toggle" href="#" id="moreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            More
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                            <li><a class="dropdown-item" href="#option1">Resource</a></li>
+                            <li><a class="dropdown-item" href="#option2">Career</a></li>
+                            <li><a class="dropdown-item" href="#option3">Pricing</a></li>
+                            <li><a class="dropdown-item" href="#option4">Privacy</a></li>
+                            <li><a class="dropdown-item" href="{% url 'home:application'%}">Application</a></li>
+                            <li><a class="dropdown-item" href="{% url 'home:resources' %}">Resources</a></li>
+                        </ul>
+                    </li>
+                    {% if user.is_authenticated %}
+
+                    {% if user.profile.avatar %}
+                    <li class="nav-item dropdown" style="margin-left: 00px">
+                        <a class="nav-link link-dark dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0;">
+                            <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                        </a>                        
+                    {% else %}
+                    <li class="nav-item dropdown" style="margin-left: 20px; border: 0.5px solid #000000;">
+                        <a class="nav-link px-2 link-dark dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </a>
+                    {% endif %}
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li class="px-3 py-2 border-bottom">
+                                <div class="fw-bold text-uppercase text-white">{{ user.get_full_name }}</div>
+                                <div class="small text-white">{{ user.email }}</div>
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'user:profile' %}">Profile</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user:logout' %}">
+                                    Logout <i class="fas fa-sign-out-alt ms-5"></i>
+                                </a>
+                            </li>
+                            {% if user.is_superuser or user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank" rel="noopener noreferrer">Admin Site</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-3">
+                        <a href="{% url 'user:login' %}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" style="font-size: 1.1rem;">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </header>
+
+        <main class="flex-grow-1">
+            {% block content %}
+            <!-- Nội dung trang sẽ nằm đây -->
+            {% endblock %}
+        </main>
+        
+        <footer class="bg-light py-1 mt-5 border-top">
+            <div class="container">
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-auto text-center text-md-start mb-3 mb-md-0">
+                        <a href="{% url 'home:home' %}">
+                            <img src="/media/transparent.png" alt="Dimension Studio Logo" height="150" style="background-color: #f8f9fa; border-radius: 12px; padding: 8px;">
+                        </a>
+                        <div class="d-flex justify-content-center justify-content-md-start mt-2" style="gap: 1.5rem;">
+                            <a href="https://www.facebook.com/profile.php?id=61576618662314" target="_blank" rel="noopener noreferrer" class="text-dark fs-4"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="text-dark fs-4"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-dark fs-4"><i class="fab fa-youtube"></i></a>
+                            <a href="https://www.instagram.com/d.imensionstudio/" target="_blank" rel="noopener noreferrer" class="text-dark fs-4"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="col d-flex justify-content-center justify-content-md-end align-items-center">
+                        <div class="d-flex" style="gap: 8rem;">
+                            <a href="{% url 'home:about_us' %}" class="footer-link">About Us</a>
+                            <a href="#contact" class="footer-link">Contact</a>
+                            <a href="#privacy" class="footer-link">Privacy & Security</a>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleView() {
+            const isChecked = document.getElementById('viewToggle').checked;
+            if (isChecked) {
+                window.location.href = "{% url 'admin_site:admin_homepage' %}";
+            } else {
+                window.location.href = "{% url 'home:home' %}";
+            }
+        }
+    </script>
+</body>
+</html>

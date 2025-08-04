@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}Purchase History{% endblock %}
+{% block content %}
+<style>
+    .profile-container {
+        display: flex;
+        min-height: calc(100vh - 60px); /* Adjust based on your header height */
+        background-color: #f8f9fa;
+    }
+    .sidebar {
+        width: 250px;
+        background-color: #fff;
+        padding: 30px 20px;
+        box-sizing: border-box;
+        border-right: 1px solid #dee2e6;
+        /* border: 1px solid #dee2e6; */
+        height: auto;
+    }
+    .avatar-container {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 10px;
+        cursor: pointer;
+    }
+    .avatar-container img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+    .avatar-container:hover img {
+        filter: brightness(0.7);
+    }
+    .avatar-container .upload-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+        border-radius: 50%;
+    }
+    .avatar-container:hover .upload-overlay {
+        opacity: 1;
+    }
+    .avatar-container .upload-overlay span {
+        color: white;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.5);
+        transition: background 0.3s;
+    }
+    .avatar-container:hover .upload-overlay span:hover {
+        background: rgba(0, 0, 0, 0.7);
+    }
+    .sidebar h2 {
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        color: #212529;
+    }
+    .sidebar a {
+        display: block;
+        margin: 15px 0;
+        font-weight: 500;
+        color: #495057;
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    .sidebar a:hover {
+        background-color: #e9ecef;
+        color: #212529;
+    }
+    .sidebar .active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .main-content {
+        flex: 1;
+        padding: 30px 50px;
+        background-color: #fff;
+        overflow-y: auto;
+    }
+    .tabs {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+    .tabs div {
+        font-weight: 500;
+        cursor: pointer;
+        padding: 10px 0;
+        color: #6c757d;
+        transition: all 0.3s ease;
+    }
+    .tabs div:hover {
+        color: #0d6efd;
+    }
+    .tabs .active {
+        color: #0d6efd;
+        border-bottom: 2px solid #0d6efd;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #495057;
+    }
+    .form-group input,
+    .form-group textarea {
+        padding: 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    .actions {
+        margin-top: 30px;
+        display: flex;
+        gap: 20px;
+    }
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .btn-primary {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+    }
+    .btn-secondary {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+    }
+    .btn-secondary:hover {
+        background-color: #f8f9fa;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+    .subscription-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    .subscription-info h3 {
+        color: #212529;
+        margin-bottom: 15px;
+    }
+    .subscription-info p {
+        color: #6c757d;
+        margin: 5px 0;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+        background-color: #0d6efd;
+        color: white;
+    }
+    .messages {
+        margin-bottom: 20px;
+    }
+    .messages .alert {
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .messages .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .messages .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    /* Override footer styles for profile page */
+    footer.bg-light {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+</style>
+
+<div class="container profile-container" style="padding-left: 0px; padding-right: 0px;">
+    <div class="sidebar">
+        <form method="POST" enctype="multipart/form-data" id="avatar-form">
+            {% csrf_token %}
+            <div class="avatar-container">
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="Avatar" onclick="showImagePreview(this.src, 'profile')">
+                {% else %}
+                    <img src="https://i.pravatar.cc/100" alt="Avatar">
+                {% endif %}
+                <div class="upload-overlay">
+                    <div class="d-flex flex-column gap-2">
+                        <!-- <span onclick="document.getElementById('avatar').click()">Change</span> -->
+                        {% if user.profile.avatar %}
+                            <span onclick="showImagePreview('{{ user.profile.avatar.url }}', 'profile')">View</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <input type="file" id="avatar" name="avatar" accept="image/*" style="display: none;" onchange="updateAvatar(this)">
+            </div>
+        </form>
+        <h2>{{ user.get_full_name|default:user.email }}</h2>
+        <a href="{% url 'user:profile' %}">Profile</a>
+        <a class="active"href="{% url 'user:purchase_history' %}">Purchase history</a>
+        
+    </div>
+
+    <div class="main-content">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h3 style="margin-bottom: 20px; border-bottom: 1px solid #dee2e6; padding-bottom: 10px;" class='text-center'>Lịch sử giao dịch</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Gói</th>
+                    <th>Giá</th>
+                    <th>Ngày mua</th>
+                    <th>Ngày hết hạn</th>
+                    <th>Trạng thái</th>
+                    <th>Ảnh thanh toán</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for purchase in purchases %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ purchase.plan.name }}</td>
+                    <td>{{ purchase.price|format_number }}</td>
+                    <td>{{ purchase.purchase_date|date:'d/m/Y H:i' }}</td>
+                    <td>{{ purchase.expired_date|date:'d/m/Y H:i' }}</td>
+                    <td>
+                        {% if purchase.status == 'success' %}
+                            <span class="badge bg-success">Thành công</span>
+                        {% elif purchase.status == 'failed' %}
+                            <span class="badge bg-danger">Thất bại</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Đang xử lý</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if purchase.payment_image %}
+                            <span type="button" class="btn btn-sm btn-info text-white" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;" onclick="showImagePreview('{{ purchase.payment_image.url }}','payment', '{{ purchase.transaction_id }}')">
+                                <i class="fas fa-image me-1"></i>View
+                            </span>
+                        {% else %}
+                            <span class="text-muted">No image</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Chưa có giao dịch nào</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Profile Image Preview Modal -->
+<div class="modal fade" id="profileImagePreviewModal" tabindex="-1" aria-labelledby="profileImagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileImagePreviewModalLabel">Profile Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="profilePreviewImage" src="" alt="Preview" style="max-width: 100%; max-height: 80vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Image Preview Modal -->
+<div class="modal fade" id="paymentImagePreviewModal" tabindex="-1" aria-labelledby="paymentImagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentImagePreviewModalLabel">Payment Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="paymentPreviewImage" src="" alt="Preview" style="max-width: 100%; max-height: 80vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.querySelector('.avatar-container img').src = e.target.result;
+            document.getElementById('avatar-form').submit();
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function showImagePreview(imageUrl, type, transactionId = null) {
+    if(type === 'profile') {
+        document.getElementById('profilePreviewImage').src = imageUrl;
+        var modal = new bootstrap.Modal(document.getElementById('profileImagePreviewModal'));
+        modal.show();
+    } else if(type === 'payment') {
+        document.getElementById('paymentPreviewImage').src = imageUrl;
+        document.getElementById('paymentImagePreviewModalLabel').textContent = transactionId;
+        var modal = new bootstrap.Modal(document.getElementById('paymentImagePreviewModal'));
+        modal.show();
+    }
+}
+</script>
+{% endblock %}

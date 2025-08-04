@@ -1,0 +1,304 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dimension Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            width: 290px;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 1rem;
+            border-right: 1px solid #dee2e6;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover {
+            background: #e9ecef;
+            color: #000;
+        }
+
+        .sidebar .nav-link.active {
+            background: #e9ecef;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Main content wrapper */
+        .main-wrapper {
+            margin-left: 280px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Admin View Toggle styles */
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 73px;
+        }
+
+        .form-switch.custom-switch {
+            padding-left: 3.5em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-switch.custom-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            margin-left: -3.5em;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+            background-position: left center;
+            border-radius: 2em;
+            transition: background-position .15s ease-in-out;
+        }
+
+        .form-switch.custom-switch .form-check-input:checked {
+            background-position: right center;
+            background-color: #0d6efd;
+        }
+
+        .form-switch.custom-switch .form-check-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            cursor: pointer;
+            white-space: nowrap;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-switch.custom-switch .form-check-label i {
+            font-size: 1.1em;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        /* Footer styles */
+        .main-footer {
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 1rem 0;
+            min-height: 73px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            .sidebar .nav-text {
+                display: none;
+            }
+            .main-wrapper {
+                margin-left: 60px;
+            }
+            .toggle-text {
+                display: none;
+            }
+            .sidebar-footer {
+                padding: 0.5rem;
+                justify-content: center;
+                min-height: 60px;
+            }
+            .main-footer {
+                min-height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="px-3 mb-4">
+            <a href="{% url 'admin_site:admin_homepage' %}">
+                <img src="/media/transparent.png" alt="Dimension Studio Logo" height="100" class="w-100 object-fit-cover">
+            </a>
+        </div>
+        
+        <ul class="nav flex-column">    
+            <li class="nav-item">
+                <a href="{% url 'admin_site:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-home fa-fw"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'admin_site:user_management' %}" class="nav-link {% if request.resolver_match.url_name == 'user_management' %}active{% endif %}">
+                    <i class="fas fa-users fa-fw"></i>
+                    <span class="nav-text">User Management</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="{% url 'admin_site:transaction_queue' %}" class="nav-link {% if request.resolver_match.url_name == 'transaction_queue' %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave fa-fw"></i>
+                    <span class="nav-text">Transaction Queue</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{% url 'admin_site:subscription_management' %}" class="nav-link {% if request.resolver_match.url_name == 'subscription_management' %}active{% endif %}">
+                    <i class="fas fa-tags fa-fw"></i>
+                    <span class="nav-text">Subscription Management</span>
+                </a>
+            </li>
+            
+        </ul>
+
+        <div class="sidebar-footer">
+            {% if user.is_superuser %}
+            <div class="form-check form-switch custom-switch">
+                <input class="form-check-input" type="checkbox" id="viewToggle" onchange="toggleView()" checked>
+                <label class="form-check-label" for="viewToggle" style="margin-top: 0.25rem; margin-left: 0.25rem;">
+                    <i class="fas fa-user-shield"></i>
+                    <span class="toggle-text">Admin View</span>
+                </label>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <!-- Header -->
+        <header class="py-3 bg-white border-bottom">
+            <div class="container-fluid px-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- <h1 class="page-title">
+                        {% if request.resolver_match.url_name == 'subscription_management' %}
+                            Subscription Management
+                        {% elif request.resolver_match.url_name == 'transaction_queue' %}
+                            Transaction Queue
+                        {% elif request.resolver_match.url_name == 'user_management' %}
+                            User Management
+                        {% else %}
+                            Admin Dashboard
+                        {% endif %}
+                    </h1> -->
+                    <div></div>
+                    <h1 class="page-title">
+                        {% if request.resolver_match.url_name %}
+                            {{request.resolver_match.url_name|format_page_title}}
+                        {%else%}
+                            Admin Dashboard
+                        {% endif %}
+                    </h1>
+                    {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        {% if user.profile.avatar %}
+                        <a class="nav-link link-dark dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0;">
+                            <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                        </a>
+                        {% else %}
+                        <a class="nav-link px-2 link-dark dropdown-toggle d-flex align-items-center border rounded-circle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 50px; height: 50px; justify-content: center;">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        {% endif %}
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li class="px-3 py-2 border-bottom">
+                                <div class="fw-bold text-uppercase">{{ user.get_full_name }}</div>
+                                <div class="small text-white">{{ user.email }}</div>
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'user:profile' %}">Profile</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user:logout' %}">
+                                    Logout <i class="fas fa-sign-out-alt ms-2"></i>
+                                </a>
+                            </li>
+                            {% if user.is_superuser or user.is_staff %}
+                            <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank" rel="noopener noreferrer">Admin Site</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'user:login' %}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow-1 py-4">
+            <div class="container-fluid px-4">
+                {% block content %}
+                <!-- Content goes here -->
+                {% endblock %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="container-fluid px-4">
+                <div class="row align-items-center">
+                    <div class="col-md-auto text-center text-md-start mb-md-0">
+                        <div class="d-flex justify-content-center justify-content-md-start" style="gap: 1.5rem;">
+                            <a href="https://www.facebook.com/profile.php?id=61576618662314" target="_blank" rel="noopener noreferrer" class="text-dark fs-4"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="text-dark fs-4"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-dark fs-4"><i class="fab fa-youtube"></i></a>
+                            <a href="https://www.instagram.com/d.imensionstudio/" target="_blank" rel="noopener noreferrer" class="text-dark fs-4"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="col d-flex justify-content-center justify-content-md-end">
+                        <div class="d-flex gap-4">
+                            <a href="{% url 'home:about_us' %}" class="text-dark text-decoration-none">About Us</a>
+                            <a href="#contact" class="text-dark text-decoration-none">Contact</a>
+                            <a href="#privacy" class="text-dark text-decoration-none">Privacy & Security</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleView() {
+            const isChecked = document.getElementById('viewToggle').checked;
+            if (isChecked) {
+                window.location.href = "{% url 'admin_site:admin_homepage' %}";
+            } else {
+                window.location.href = "{% url 'home:home' %}";
+            }
+        }
+    </script>
+</body>
+</html>

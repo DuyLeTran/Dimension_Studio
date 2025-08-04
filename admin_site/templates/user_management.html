@@ -1,0 +1,251 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <h1>User Management</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="fas fa-filter me-1"></i> Filters
+        </button>
+    </div>
+
+    {% if messages %}
+    <div class="messages mt-3">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalLabel">Filter Transactions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="role" class="form-label">Role</label>
+                            <select name="role" id="role" class="form-select">
+                                <option value="">All</option>
+                                <option value="Admin" {% if request.GET.role == 'Admin' %}selected{% endif %}>Admin</option>
+                                <option value="Staff" {% if request.GET.role == 'Staff' %}selected{% endif %}>Staff</option>
+                                <option value="User" {% if request.GET.role == 'User' %}selected{% endif %}>User</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="subscription" class="form-label">Subscription</label>
+                            <select name="subscription" id="subscription" class="form-select">
+                                <option value="">All</option>
+                                {% for subscription in subscriptions %}
+                                <option value="{{ subscription.id }}" {% if request.GET.subscription == subscription.id|stringformat:"i" %}selected{% endif %}>{{ subscription.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="search_email" class="form-label">Search by Phone Number</label>
+                            <input type="text" class="form-control" id="search_phone" name="search_phone" placeholder="Enter phone number..." value="{{ request.GET.search_phone }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="expired_date" class="form-label">Expired Date</label>
+                            <input type="date" class="form-control" id="expired_date" name="expired_date" value="{{ request.GET.expired_date }}">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="search_email" class="form-label">Search by Email</label>
+                                <input type="text" class="form-control" id="search_email" name="search_email" placeholder="Enter email..." value="{{ request.GET.search_email }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="search_name" class="form-label">Search by Name</label>
+                                <input type="text" class="form-control" id="search_name" name="search_name" placeholder="Enter name..." value="{{ request.GET.search_name }}">
+                            </div>
+                        </div>
+                        <div class="col-12 text-end">
+                            <a href="{% url 'admin_site:user_management' %}" class="btn btn-secondary">Reset</a>
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Users
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>Phone</th>
+                        <th>Current Plan</th>
+                        <th>Attempt</th>
+                        <th>Expired Date</th>
+                        <th>Last Login</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.email }}</td>
+                        <td>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}NAN{% endif %}</td>
+                        <td>{% if user.profile.phone != '' %}{{ user.profile.phone }}{% else %}NAN{% endif %}</td>
+                        <td>{{ user.profile.subscription.name }}</td>
+                        {% if user.profile.subscription.name == 'Free' %} <td style='padding-left: 1.6rem'>{{ user.profile.attempts }}</td> {% else %} <td style='padding-left: 1.8rem'>&infin;</td>{% endif %}
+                        <td>{{ user.profile.expired_date|date:"d/m/Y H:i" }}</td>
+                        <td>{{ user.last_login|date:"d/m/Y H:i" }}</td>
+                        <td> {% if user.is_superuser %} Admin {% elif user.is_staff %} Staff {% else %} User{% endif %} </td>
+                        <td>
+                            {% if user.is_superuser %}
+                                <span class="badge bg-danger text-white">Restricted</span>
+                            {% else %}
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#editModal{{ user.id }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    <form method="post" action="{% url 'admin_site:delete_user' user.id %}">
+                                        {% csrf_token %}
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Edit User Modal -->
+                                <div class="modal fade" id="editModal{{ user.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ user.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editModalLabel{{ user.id }}">Edit User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form method="post" action="{% url 'admin_site:edit_user' user.id %}">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="email{{ user.id }}" class="form-label">Email</label>
+                                                        <input type="email" class="form-control" id="email{{ user.id }}" value="{{ user.email }}" readonly>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="first_name{{ user.id }}" class="form-label">First Name</label>
+                                                            <input type="text" class="form-control" id="first_name{{ user.id }}" name="first_name" value="{{ user.first_name }}">
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="last_name{{ user.id }}" class="form-label">Last Name</label>
+                                                            <input type="text" class="form-control" id="last_name{{ user.id }}" name="last_name" value="{{ user.last_name }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="phone{{ user.id }}" class="form-label">Phone</label>
+                                                            <input type="text" class="form-control" id="phone{{ user.id }}" name="phone" value="{{ user.profile.phone }}">
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="subscription{{ user.id }}" class="form-label">Subscription</label>
+                                                            <select class="form-select" id="subscription{{ user.id }}" name="subscription">
+                                                                {% for subscription in subscriptions %}
+                                                                <option value="{{ subscription.id }}" {% if user.profile.subscription.id == subscription.id %}selected{% endif %}>
+                                                                    {{ subscription.name }}
+                                                                </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="role{{ user.id }}" class="form-label">Role</label>
+                                                            <select class="form-select" id="role{{ user.id }}" name="role">
+                                                                <option value="User" {% if not user.is_staff and not user.is_superuser %}selected{% endif %}>User</option>
+                                                                <option value="Staff" {% if user.is_staff and not user.is_superuser %}selected{% endif %}>Staff</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="attempt{{ user.id }}" class="form-label">Attempt</label>
+                                                            <input type="number" class="form-control" id="attempt{{ user.id }}" name="attempt" value="{{ user.profile.attempt }}" min="-99" max="30">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to remove this user: <strong>{{ user.email }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form method="post" action="{% url 'admin_site:delete_user' user.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            {% if purchases.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if purchases.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ purchases.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in purchases.paginator.page_range %}
+                    <li class="page-item {% if purchases.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if purchases.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ purchases.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

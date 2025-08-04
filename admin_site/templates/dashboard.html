@@ -1,0 +1,128 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .stat-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .stat-change {
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .stat-change.positive {
+        color: #198754;
+    }
+
+    .stat-change.negative {
+        color: #dc3545;
+    }
+</style>
+
+<div class="row g-4">
+    <!-- Total Users Card -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card p-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12%</span>
+                </div>
+            </div>
+            <h3 class="stat-value">{{ users.count }}</h3>
+            <p class="stat-label">Total Users</p>
+        </div>
+    </div>
+
+    <!-- Active Subscriptions Card -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card p-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8%</span>
+                </div>
+            </div>
+            <h3 class="stat-value">{{active_subscriptions}}</h3>
+            
+            <p class="stat-label">Active Subscriptions</p>
+        </div>
+    </div>
+
+    <!-- Monthly Revenue Card -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card p-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon bg-info bg-opacity-10 text-info">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>15%</span>
+                </div>
+            </div>
+            <h3 class="stat-value">$24,500</h3>
+            <p class="stat-label">Monthly Revenue</p>
+        </div>
+    </div>
+
+    <!-- Pending Transactions Card -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card p-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>5%</span>
+                </div>
+            </div>
+            <h3 class="stat-value">18</h3>
+            <p class="stat-label">Pending Transactions</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

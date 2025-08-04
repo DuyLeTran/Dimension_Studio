@@ -1,0 +1,513 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}Payment{% endblock %}
+{% block content %}
+<div class="payment-container">
+    <div class="container">
+        <div class="payment-card">
+            <div class="payment-header">
+                <h2>Payment Details</h2>
+                <p class="text-muted">Complete your subscription payment</p>
+            </div>
+
+            <div class="payment-content">
+                <div class="subscription-info">
+                    <div class="plan-details">
+                        <div class="plan-header">
+                            <h3>{{ subscription.name }} Plan</h3>
+                            <div class="price">{{ subscription.price|format_number }} VNĐ</div>
+                        </div>
+                        <div class="plan-features">
+                            {% for feature in subscription.description|split_by_newline %}
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>{{ feature }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="plan-summary">
+                            <div class="summary-item">
+                                <span class="label">Start Date:</span>
+                                <!-- <span class="value">{{ now|date:"d/m/Y" }}</span> -->
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">End Date:</span>
+                                
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Duration:</span>
+                                <span class="value">30 days</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <h4>Payment Method</h4>
+                    <div class="qr-section">
+                        {% if subscription.name == 'Premium' %}
+                            <img src="/media/QR code/50k.png" alt="Payment" class="payment-image">
+                        {% elif subscription.name == 'Plus' %}
+                            <img src="/media/QR code/10k.png" alt="Payment" class="payment-image">
+                        {% endif %}
+                        <p class="qr-note">Scan QR code to make payment</p>
+                    </div>
+                </div>
+                <form method="post" class="payment-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="payment-confirmation">
+                        <h4>Payment Confirmation</h4>
+                        <div class="upload-section">
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Drag & Drop or Click to Upload</p>
+                                <span class="upload-hint">Upload your payment confirmation screenshot</span>
+                            </div>
+                            <input type="file" id="paymentImage" name="payment_image" accept="image/*" class="file-input" hidden required>
+                            
+                            <div id="imagePreview" class="image-preview" style="display: none;">
+                                <img id="previewImg" src="" alt="Preview" onclick="showImagePreview(this.src)">
+                                <button type="button" class="remove-image" onclick="removeImage()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+                <div class="form-actions">
+                    <button type="submit" class="btn-pay">Complete Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imagePreviewModalLabel">Payment Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="previewImage" src="" alt="Payment Preview" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-container {
+        padding: 40px 0;
+        background-color: #f8f9fa;
+        min-height: calc(100vh - 200px);
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        padding: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .payment-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .payment-header h2 {
+        color: #2c3e50;
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .payment-content {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .subscription-info, .payment-methods, .payment-confirmation {
+        flex: 1;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .plan-details {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .plan-header {
+        text-align: center;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .plan-header h3 {
+        color: #2c3e50;
+        font-size: 24px;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .price {
+        font-size: 36px;
+        font-weight: bold;
+        color: #0d6efd;
+        margin-bottom: 5px;
+    }
+
+    .duration {
+        color: #6c757d;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .plan-features {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #495057;
+        font-size: 15px;
+    }
+
+    .feature-item i {
+        color: #28a745;
+        font-size: 18px;
+    }
+
+    .plan-summary {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .summary-item .label {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .summary-item .value {
+        color: #2c3e50;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .payment-methods h4, .payment-confirmation h4 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 20px;
+    }
+
+    .qr-section {
+        text-align: center;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+    }
+
+    .payment-image {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        object-fit: cover;
+    }
+
+    .qr-note {
+        color: #6c757d;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .upload-section {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .upload-area:hover {
+        border-color: #0d6efd;
+        background: #f8f9fa;
+    }
+
+    .upload-area i {
+        font-size: 40px;
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+
+    .upload-area p {
+        margin: 10px 0;
+        color: #495057;
+    }
+
+    .upload-hint {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .image-preview {
+        position: relative;
+        margin-top: 20px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .image-preview img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .image-preview img:hover {
+        transform: scale(1.02);
+    }
+
+    .remove-image {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+
+    .remove-image:hover {
+        background: #c82333;
+    }
+
+    .payment-form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(13,110,253,0.1);
+    }
+
+    .form-text {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .form-actions {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .btn-pay {
+        width: 100%;
+        padding: 14px;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-pay:hover {
+        background: #0b5ed7;
+    }
+
+    .modal-content {
+        background-color: #f8f9fa;
+        border: none;
+        border-radius: 15px;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-title {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-body img {
+        max-width: 100%;
+        max-height: 70vh;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .btn-close {
+        background-color: #6c757d;
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+    }
+
+    .btn-close:hover {
+        opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+        .payment-content {
+            flex-direction: column;
+        }
+
+        .payment-card {
+            padding: 20px;
+        }
+
+        .payment-image {
+            max-width: 200px;
+        }
+
+        .plan-header h3 {
+            font-size: 20px;
+        }
+
+        .price {
+            font-size: 28px;
+        }
+
+        .feature-item {
+            font-size: 14px;
+        }
+
+        .summary-item .label,
+        .summary-item .value {
+            font-size: 13px;
+        }
+    }
+</style>
+
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('paymentImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#0d6efd';
+        uploadArea.style.background = '#f8f9fa';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = '#dee2e6';
+        uploadArea.style.background = '#fff';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#dee2e6';
+        uploadArea.style.background = '#fff';
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            handleImageUpload(file);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleImageUpload(file);
+        }
+    });
+
+    function handleImageUpload(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            imagePreview.style.display = 'block';
+            uploadArea.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeImage() {
+        fileInput.value = '';
+        imagePreview.style.display = 'none';
+        uploadArea.style.display = 'block';
+    }
+
+    function showImagePreview(imageUrl) {
+        document.getElementById('previewImage').src = imageUrl;
+        var modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+        modal.show();
+    }
+</script>
+{% endblock %} 

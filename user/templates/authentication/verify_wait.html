@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="mb-4">Xác minh tài khoản</h2>
+                    <p class="lead">Vui lòng kiểm tra email của bạn để xác minh tài khoản.</p>
+                    <p>Một email xác minh đã được gửi đến địa chỉ email của bạn.</p>
+                    <p>Link xác minh sẽ hết hạn sau:</p>
+                    <div class="countdown-timer mb-4">
+                        <span id="minutes">20</span>:<span id="seconds">00</span>
+                    </div>
+                    <div class="alert alert-info">
+                        <p>Nếu bạn không nhận được email, vui lòng kiểm tra thư mục spam hoặc đăng ký lại.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.countdown-timer {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #007bff;
+}
+</style>
+
+<script>
+function startCountdown() {
+    const TWENTY_MINUTES = 20 * 60 * 1000; // 20 minutes in milliseconds
+    const minutesElement = document.getElementById('minutes');
+    const secondsElement = document.getElementById('seconds');
+    
+    // Lấy thời điểm bắt đầu từ localStorage hoặc tạo mới
+    let startTime = localStorage.getItem('verificationStartTime');
+    if (!startTime) {
+        startTime = Date.now();
+        localStorage.setItem('verificationStartTime', startTime);
+    }
+
+    function updateCountdown() {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - parseInt(startTime);
+        const remainingTime = Math.max(0, TWENTY_MINUTES - elapsedTime);
+        
+        const minutes = Math.floor(remainingTime / (60 * 1000));
+        const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
+        
+        minutesElement.textContent = minutes.toString().padStart(2, '0');
+        secondsElement.textContent = seconds.toString().padStart(2, '0');
+        
+        if (remainingTime <= 0) {
+            clearInterval(countdownInterval);
+            // Xóa thời điểm bắt đầu khỏi localStorage
+            localStorage.removeItem('verificationStartTime');
+            // Chuyển hướng về trang đăng ký
+            window.location.href = "{% url 'user:register' %}";
+        }
+    }
+
+    // Cập nhật ngay lập tức
+    updateCountdown();
+    
+    // Cập nhật mỗi giây
+    const countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// Xóa thời điểm bắt đầu cũ khi tải trang mới
+window.addEventListener('beforeunload', function() {
+    localStorage.removeItem('verificationStartTime');
+});
+
+// Bắt đầu đếm ngược khi trang được tải
+document.addEventListener('DOMContentLoaded', startCountdown);
+</script>
+{% endblock %} 

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Application{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    
+    <div style="
+        max-width: 1050px;
+        margin: 0 auto;
+        padding: 70px;
+        border: 2px dashed #9b9a9a;
+    ">
+        <div class="p-0 m-0">
+            <h2 class="text-center fw-bold mb-3" style="font-size: 28px;">
+                <span style="text-decoration: underline; text-decoration-color: #333; text-decoration-thickness: 2px; text-underline-offset: 8px;">Digital Marketing Strategist Application Form</span>
+            </h2>
+
+            <div class="mt-4" style="max-width: 800px; margin: auto; font-size: 20px; line-height: 1.6;">
+                <p><strong>Who We Are</strong><br>
+                Dimension Studio is the industry's leading consumer experience platform, empowering apparel and footwear
+                retailers to decode fit and size and connect shoppers with only what they love. By uniting social, general,
+                and personalized guidance into one cohesive experience, we drive shopper confidence and loyalty while delivering rich insights to inform strategies across marketing, merchandising, sourcing, and product development. Our seasoned leadership team—hailing from fashion, retail, big data, and ecommerce—is backed by top investors and dedicated to transforming the shopping journey.</p>
+
+                <p><strong>The Role</strong><br>
+                We are seeking a passionate Digital Marketing Strategist to join our dynamic marketing team. In this 100% remote role, you’ll spearhead digital campaigns that amplify our brand, drive engagement, and convert prospects into loyal customers. Collaborating with cross-functional teams from product to creative and data, you’ll develop integrated marketing strategies across social media, SEM, email, and content channels that showcase Dimension Studio’s unique value. If you’re ready to make a global impact through innovative digital marketing, we want to hear from you.</p>
+
+                <p><strong>Key Responsibilities</strong></p>
+                <ul>
+                    <li>Develop and execute integrated digital marketing strategies that boost brand awareness and drive conversions.</li>
+                    <li>Optimize campaign performance using data-driven insights and agile testing methodologies.</li>
+                    <li>Oversee content creation for social media, email marketing, and online advertising initiatives.</li>
+                    <li>Collaborate with internal teams to ensure messaging consistency and creative excellence.</li>
+                    <li>Monitor industry trends and competitive activities to continuously refine our marketing approach.</li>
+                </ul>
+
+                <p><strong>Desired Skills & Experience</strong></p>
+                <ul>
+                    <li>3+ years of experience in digital marketing, preferably in e-commerce or tech-driven environments.</li>
+                    <li>Strong expertise in SEO/SEM, marketing automation, and analytics platforms (e.g., Google Analytics, HubSpot).</li>
+                    <li>Excellent analytical skills and a data-first mindset with the ability to translate insights into action.</li>
+                    <li>Outstanding written and verbal communication skills in English.</li>
+                    <li>Bachelor's degree in Marketing, Communications, or a related field preferred.</li>
+                </ul>
+
+                <p><strong>Why Dimension Studio?</strong><br>
+                At Dimension Studio, we believe that one size does not fit all. We’re on a mission to redefine personalization in fashion commerce through innovative technology and exceptional user experiences.</p>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full name *</label>
+                        <input type="text" class="form-control border" id="full_name" name="full_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email *</label>
+                        <input type="email" class="form-control border" id="email" name="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone number *</label>
+                        <input type="text" class="form-control border" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">When are you available to start? *</label>
+                        <select class="form-select border" id="start_date" name="start_date" required>
+                            <option value="Immediately">Immediately</option>
+                            <option value="1 Week">In 1 Week</option>
+                            <option value="2 Weeks">In 2 Weeks</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="reside_vn" class="form-label">Do you currently reside in Vietnam? *</label>
+                        <select class="form-select border" id="reside_vn" name="reside_vn" required>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="experience" class="form-label">How many years of digital marketing experience do you have? *</label>
+                        <select class="form-select border" id="experience" name="experience" required>
+                            <option value="0-2 years">0–2 years</option>
+                            <option value="3-5 years">3–5 years</option>
+                            <option value="6+ years">6+ years</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark">Send application</button>
+                    <p class="mt-2 text-muted small">
+                        By clicking <strong>Send application</strong>, you agree to our
+                        <a href="#" class="text-decoration-underline">Privacy Policy</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

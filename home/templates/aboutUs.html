@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="py-5">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6 mb-4 mb-md-0" style="margin-top: 10px;">
+                <h1 class="fw-bold mb-4" style="font-size: 4rem; font-weight: 600; line-height: 1.2; margin-bottom: 20px;">Our Story</h1>
+                <div class="mb-5">
+                    <p class="text-muted" style="font-size: 1.2rem; line-height: 1.5;">
+                        Fashion is deeply personal—your style is an expression of who you are. 
+                        Yet, finding clothes that truly fit can be a challenge. That's why we 
+                        set out to transform the shopping experience by combining decades of expertise 
+                        in fashion, retail technology, and data science. We empower every shopper with 
+                        a seamless, hyper-personalized journey that minimizes returns and maximizes 
+                        satisfaction.
+                    </p>
+                </div>
+                <div class="mb-5">
+                    <p class="text-muted" style="font-size: 1.2rem; line-height: 1.5;">
+                        Today, we've evolved from a simple idea into a robust platform that understands millions of unique 
+                        shopper profiles on an almost DNA level. Leveraging advanced AI and machine learning, we've built the 
+                        Fashion Genome—the world’s most comprehensive fashion dataset that connects you with pieces you’ll love. 
+                        This isn’t just a luxury; it’s the future of shopping, designed for every body, every size, and every 
+                        style.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6 text-end">
+                <img src="/media/clothes_AboutUs_1.png" alt="Retailer Demo" class="img-fluid" style="display: inline-block; width: 70%;">
+            </div>
+        </div>
+    </div>
+</div>
+<section class="py-5">
+    <div class="container">
+        <h1 class="fw-bold mb-5" style="font-size: 4rem; font-weight: 600; line-height: 1.2; margin-bottom: 20px;">The Team</h1>
+        <div class="row g-4">
+            <!-- Card 1 -->
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3" style='background-color: whitesmoke;'>
+                    <img src="/media/avt_Sy_Tan.png" class="rounded" alt="Nguyễn Ngọc Sỹ Tân" style="height: 250px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">Nguyễn Ngọc Sỹ Tân</h5>
+                        <p class="card-text text-muted">Lead Design</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3" style='background-color: whitesmoke;'>
+                    <img src="/media/avt_Hoai Khang.png" class="rounded" alt="Phan Hoài Khang" style="height: 250px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">Phan Hoài Khang</h5>
+                        <p class="card-text text-muted">Lead Marketing</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3" style='background-color: whitesmoke;'>
+                    <img src="/media/avt_Le_Duy.png" class="rounded" alt="Trần Lê Duy" style="height: 250px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">Trần Lê Duy</h5>
+                        <p class="card-text text-muted">Lead Developer</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3" style='background-color: whitesmoke;'>
+                    <img src="/media/avt_Minh_Thanh.png" class="rounded" alt="Phạm Minh Thành" style="height: 250px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">Phạm Minh Thành</h5>
+                        <p class="card-text text-muted">Developer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3" style='background-color: whitesmoke;'>
+                    <img src="/media/avt_Phu_Duy.png" class="rounded" alt="Châu Phú Duy" style="height: 250px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">Châu Phú Duy</h5>
+                        <p class="card-text text-muted">Developer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3" style='background-color: whitesmoke;'>
+                    <img src="/media/avt_Anh Tuan.png" class="rounded" alt="Lê Anh Tuấn" style="height: 250px; object-fit: contain;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">Lê Anh Tuấn</h5>
+                        <p class="card-text text-muted">Marketing</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Add more cards here... -->
+        </div>
+    </div>
+</section>
+{% endblock %}
