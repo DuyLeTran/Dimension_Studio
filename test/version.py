@@ -1,4 +1,0 @@
-import torch, platform
-
-print(torch.version.__version__)     
-print(torch.cuda.is_available())     
