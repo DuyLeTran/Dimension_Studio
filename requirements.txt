@@ -1,4 +1,6 @@
 asgiref==3.8.1
+certifi==2025.8.3
+cloudinary==1.44.1
 Django==5.2.3
 dotenv==0.9.9
 filelock==3.18.0
@@ -11,8 +13,10 @@ numpy==2.3.0
 opencv-python==4.11.0.86
 pillow==11.2.1
 python-dotenv==1.1.0
+six==1.17.0
 sqlparse==0.5.3
 sympy==1.14.0
 torch==2.7.1
 torchvision==0.22.1
 typing_extensions==4.14.0
+urllib3==2.5.0
