@@ -130,6 +130,14 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS       = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 DEFAULT_FROM_EMAIL  = EMAIL_HOST_USER
 
+# Cloudinary configuration
+CLOUDINARY_NAME       = os.getenv('CLOUDINARY_NAME')
+CLOUDINARY_API_KEY    = os.getenv('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET')
+
+# FASHION_API_KEY configuration
+FASHN_API_KEY = os.getenv('FASHN_API_KEY')
+
 # Authentication settings
 '''
 - LOGIN_URL: URL to redirect to when a user needs to login

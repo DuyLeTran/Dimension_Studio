@@ -10,13 +10,16 @@ from django.utils import timezone
 def is_admin(user):
     return user.is_superuser   
 
+def is_staff(user):
+    return user.is_staff
+
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_staff)
 def admin_homepage(request):
     return redirect('admin_site:dashboard')
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_staff)
 def dashboard(request):
     active_subscriptions = User.objects.filter(
         Q(profile__subscription__name__iexact = 'Plus') |
@@ -33,7 +36,7 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_staff)
 def user_management(request):
     users = User.objects.all() 
     subscriptions = Subscription.objects.all()
@@ -131,7 +134,7 @@ def delete_user(request, user_id):
     return redirect('admin_site:user_management') 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_staff)
 def transaction_queue(request):
     # Get filter parameters
     status = request.GET.get('status', '')
@@ -209,7 +212,7 @@ def update_transaction_status(request, transaction_id):
     return redirect('admin_site:transaction_queue')
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_staff)
 def subscription_management(request):
     subscriptions = Subscription.objects.all()
 

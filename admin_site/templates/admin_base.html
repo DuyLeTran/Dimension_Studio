@@ -183,7 +183,7 @@
         </ul>
 
         <div class="sidebar-footer">
-            {% if user.is_superuser %}
+            {% if user.is_superuser or user.is_staff %}
             <div class="form-check form-switch custom-switch">
                 <input class="form-check-input" type="checkbox" id="viewToggle" onchange="toggleView()" checked>
                 <label class="form-check-label" for="viewToggle" style="margin-top: 0.25rem; margin-left: 0.25rem;">
