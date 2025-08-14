@@ -1,169 +1,150 @@
 {% extends 'base.html' %}
-{# NOTE: Đã bỏ {% load static %} ở đây vì bạn sẽ dùng /media/ trực tiếp cho ảnh, và các CSS đã được load từ base.html. #}
-{# Các style tùy chỉnh của trang này được nhúng trực tiếp vào đây. #}
+{# NOTE: Removed {% load static %} here because you will use /media/ directly for images, and CSS has already been loaded from base.html. #}
+{# Custom styles for this page are embedded directly here. #}
 
 {% block title %}Resources - Dimension Studio{% endblock %}
 
 {% block content %}
 <style>
-    /* General Body Styles - Có thể đã có trong base.html hoặc style.css */
+    /* General Body Styles - May already exist in base.html or style.css */
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
         color: #333;
+        margin: 0;
+        padding: 0;
     }
-
-    /* Header Styles (from base.html, if not already in style.css) */
+    
+    /* Header Styles */
     header {
-        background-color: #ffffff; /* Hoặc màu nền mong muốn cho header */
-        border-bottom: 1px solid #e0e0e0;
+        background-color: #ffffff; /* Or desired background color for header */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
-
-    .nav-link.link-dark {
+    
+    /* Navigation Styles */
+    .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+        color: #667eea !important;
+    }
+    
+    .nav-link {
         color: #333 !important;
         font-weight: 500;
+        transition: color 0.3s ease;
     }
-
-    .nav-link.link-dark:hover {
-        color: #000 !important;
+    
+    .nav-link:hover {
+        color: #667eea !important;
     }
-
-    .btn-dark {
-        background-color: #333;
-        border-color: #333;
-    }
-
-    .btn-dark:hover {
-        background-color: #000;
-        border-color: #000;
-    }
-
-    /* Footer Styles (from base.html, if not already in style.css) */
+    
+    /* Footer Styles */
     footer {
-        background-color: #f8f9fa; /* Màu nền nhẹ cho footer */
-        border-top: 1px solid #e0e0e0;
+        background-color: #f8f9fa; /* Light background color for footer */
+        color: #666;
+        padding: 2rem 0;
+        margin-top: 3rem;
     }
-
-    .footer-link {
-        color: #555;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s ease-in-out;
-    }
-
-    .footer-link:hover {
-        color: #000;
-    }
-
-    /* --- Resource Page Specific Styles --- */
-
+    
+    /* Hero Section */
     .hero-section {
-        background-image: url('/media/img_resource-1.png'); /* Đảm bảo đường dẫn đúng */
+        background-image: url('/media/img_resource-1.png'); /* Ensure correct path */
         background-size: cover;
-        background-position: center center;
-        background-repeat: no-repeat;
-        height: 350px;
-        width: 100%;
+        background-position: center;
+        background-attachment: fixed;
+        height: 60vh;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
-        color: #fff;
-        overflow: hidden;
-        border-radius: 8px; /* Bo góc của hero section */
-        position: relative; /* Để có thể thêm lớp phủ nếu muốn */
+        color: white;
+        margin-bottom: 3rem;
+        border-radius: 8px; /* Rounded corners for hero section */
+        position: relative; /* To add overlay if desired */
     }
-
-    /* Optional: Lớp phủ đen nhẹ cho hero section để text dễ đọc hơn */
+    
+    /* Optional: Light black overlay for hero section to make text more readable */
     .hero-section::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.4); /* Lớp phủ đen 40% opacity */
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.4); /* Black overlay with 40% opacity */
         border-radius: 8px;
-        z-index: 0;
     }
-
+    
     .hero-content {
-        z-index: 1; /* Đảm bảo nội dung nằm trên lớp phủ */
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Thêm đổ bóng cho chữ để dễ đọc */
-        padding: 0 15px; /* Thêm padding ngang để tránh text sát mép trên mobile */
+        position: relative;
+        z-index: 1; /* Ensure content is above overlay */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Add shadow to text for better readability */
     }
-
-    .hero-content h1 {
-        font-size: 3.5rem; /* Tăng kích thước font cho tiêu đề chính */
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .hero-content p {
-        font-size: 1.5rem; /* Tăng kích thước font cho mô tả */
-        font-weight: 300;
-    }
-
 
     /* Article Card Styles */
-    .card {
-        border: none; /* Bỏ border mặc định của card */
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Tăng bóng nhẹ cho card để nổi bật hơn */
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Hiệu ứng hover mượt mà */
-        border-radius: 8px; /* Bo góc card */
-        overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài góc bo */
+    .article-card {
+        border: none; /* Remove default card border */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Increase light shadow for cards to make them stand out more */
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth hover effect */
+        border-radius: 8px; /* Rounded card corners */
+        overflow: hidden; /* Ensure content doesn't overflow rounded corners */
+    }
+    
+    .article-card:hover {
+        transform: translateY(-8px); /* Lift card more when hovering */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Clearer shadow when hovering */
+    }
+    
+    .article-card img {
+        height: 220px; /* Increase fixed height for images to make them uniform and slightly larger */
+        object-fit: cover; /* Ensure images fit the frame without distortion */
     }
 
-    .card:hover {
-        transform: translateY(-8px); /* Nâng card lên nhiều hơn khi hover */
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Bóng rõ hơn khi hover */
+    .article-card .card-body {
+        padding: 1.5rem; /* Ensure default Bootstrap card-body padding, can increase slightly */
     }
 
-    .card-img-top-custom {
-        width: 100%;
-        height: 220px; /* Tăng chiều cao cố định cho ảnh để chúng đồng đều và lớn hơn một chút */
-        object-fit: cover; /* Đảm bảo ảnh vừa khung mà không bị méo */
-        border-radius: 8px 8px 0 0; /* Bo góc trên cho ảnh */
-    }
-
-    .card-body {
-        padding: 1.5rem; /* Đảm bảo padding mặc định của Bootstrap card-body, có thể tăng nhẹ */
-    }
-
-    .card-title {
-        font-size: 1.3rem; /* Kích thước tiêu đề bài viết */
+    .article-card .card-title {
+        font-size: 1.3rem; /* Article title size */
         font-weight: 600;
-        line-height: 1.4;
         margin-bottom: 0.75rem;
         color: #333;
+        line-height: 1.3;
     }
-
-    .card-text {
-        font-size: 1rem;
-        color: #555;
+    
+    .article-card .card-text {
+        color: #666;
         line-height: 1.6;
-        margin-bottom: 1rem;
-        min-height: 50px; /* Đảm bảo chiều cao tối thiểu cho đoạn text để các card đồng đều */
+        min-height: 50px; /* Ensure minimum height for text to make cards uniform */
     }
-
-    .article-tag {
+    
+    .article-card .tag {
+        background-color: #e0e0e0; /* Background color for tag */
+        color: #666;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px; /* Rounded tag */
+        font-size: 0.8rem;
         display: inline-block;
-        background-color: #e0e0e0; /* Màu nền cho tag */
-        padding: 6px 12px;
-        border-radius: 20px; /* Bo tròn tag */
-        font-size: 0.85em;
-        font-weight: 600;
-        color: #444;
-        margin-top: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
     }
-
-    /* Pagination Button */
-    .btn-dark.pagination-btn {
-        padding: 10px 30px;
-        font-size: 1.1rem;
+    
+    .load-more-btn {
+        background-color: #667eea;
+        border: none;
+        border-radius: 30px; /* Rounded button */
+        padding: 0.75rem 2rem;
         font-weight: 600;
-        border-radius: 30px; /* Nút bo tròn */
+        transition: all 0.3s ease;
+    }
+    
+    .load-more-btn:hover {
+        background-color: #5a6fd8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
 </style>
 
@@ -175,108 +156,24 @@
 </div>
 
 <section class="container py-5">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> {# Thêm row-cols-lg-3 để hiển thị 3 cột trên màn hình lớn #}
-        {# Article Card 1 (Inc.) #}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> {# Add row-cols-lg-3 to display 3 columns on large screens #}
         <div class="col">
-            <a href="#" class="card-link text-decoration-none"> {# Thêm thẻ <a> để toàn bộ card có thể click #}
-                <div class="card h-100">
-                    <img src="/media/img_resource-1.png" class="card-img-top-custom" alt="Amazon joins fit tech frenzy">
-                    <div class="card-body d-flex flex-column"> {# Dùng flexbox để sticky tag xuống dưới #}
-                        <h5 class="card-title">Inc. - Amazon joins fit tech frenzy to curb returns. Is now time to give AI tools a try?</h5>
-                        <p class="card-text">Discover how major players like Amazon are leveraging AI to revolutionize e-commerce returns, and why it's time for your business to adopt these innovative solutions.</p>
-                        <div class="mt-auto"> {# Đẩy tag xuống cuối card-body #}
-                            <span class="article-tag">News</span>
+            <a href="#" class="card-link text-decoration-none"> {# Add <a> tag so entire card can be clicked #}
+                <div class="article-card card h-100">
+                    <div class="card-body d-flex flex-column"> {# Use flexbox to stick tag to bottom #}
+                        <div class="mt-auto"> {# Push tag to bottom of card-body #}
+                            <span class="tag">AI</span>
+                            <span class="tag">Virtual Try-On</span>
                         </div>
                     </div>
                 </div>
             </a>
         </div>
-
-        {# Article Card 2 (The Future of E-Commerce) #}
-        <div class="col">
-            <a href="#" class="card-link text-decoration-none">
-                <div class="card h-100">
-                    <img src="/media/img_resource-2.png" class="card-img-top-custom" alt="The Future of E-Commerce">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">The Future of E-Commerce: Trends & Insights from Our Latest Research</h5>
-                        <p class="card-text">Explore cutting-edge trends and valuable insights from our comprehensive research, shaping the future landscape of online retail.</p>
-                        <div class="mt-auto">
-                            <span class="article-tag">Case Study</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        {# Article Card 3 (Discover Gen Z's favorite brands) #}
-        <div class="col">
-            <a href="#" class="card-link text-decoration-none">
-                <div class="card h-100">
-                    <img src="/media/img_resource-3.png" class="card-img-top-custom" alt="Gen Z's favorite brands">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Discover Gen Z's favorite brands and what drives their purchasing decisions</h5>
-                        <p class="card-text">Unlock the secrets to appealing to the next generation of consumers by understanding their preferences and motivations.</p>
-                        <div class="mt-auto">
-                            <span class="article-tag">Consumer Trend</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        {# Article Card 4 (Five reasons your PDP needs AI size guidance) #}
-        <div class="col">
-            <a href="#" class="card-link text-decoration-none">
-                <div class="card h-100">
-                    <img src="/media/img_resource-4.png" class="card-img-top-custom" alt="AI size guidance for PDP">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Five reasons your PDP needs AI size guidance to convert more shoppers</h5>
-                        <p class="card-text">Learn how integrating AI-powered size guidance on your Product Detail Pages can significantly boost conversion rates and enhance customer satisfaction.</p>
-                        <div class="mt-auto">
-                            <span class="article-tag">Blog</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        {# Add more article cards here as needed #}
-        {# Example of a new card #}
-        <div class="col">
-            <a href="#" class="card-link text-decoration-none">
-                <div class="card h-100">
-                    <img src="/media/placeholder-article-5.png" class="card-img-top-custom" alt="New Article Title">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Latest Innovations in Virtual Try-On Technology</h5>
-                        <p class="card-text">Dive into the newest advancements in virtual try-on, revolutionizing how customers experience and purchase fashion online.</p>
-                        <div class="mt-auto">
-                            <span class="article-tag">Innovation</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col">
-            <a href="#" class="card-link text-decoration-none">
-                <div class="card h-100">
-                    <img src="/media/placeholder-article-6.png" class="card-img-top-custom" alt="Customer Success Story">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">How "Fashion Co." Achieved a 30% Reduction in Returns with Dimension Studio</h5>
-                        <p class="card-text">A detailed look at our collaboration with Fashion Co. and the remarkable results they achieved by implementing our virtual try-on solution.</p>
-                        <div class="mt-auto">
-                            <span class="article-tag">Success Story</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        
     </div>
-
-    {# PAGINATION - Nút "Next" #}
+    
+    {# PAGINATION - Next button #}
     <div class="text-center mt-5">
-        <button class="btn btn-dark pagination-btn">Load More Articles</button> {# Đổi text thành "Load More" để linh hoạt hơn #}
+        <button class="btn btn-dark pagination-btn">Load More Articles</button> {# Change text to "Load More" for more flexibility #}
     </div>
 </section>
 

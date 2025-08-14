@@ -89,9 +89,9 @@
                             </span>
                         </div>
                         <div class="password-requirements">
-                            <p id="length" class="invalid">Mật khẩu phải chứa ít nhất 8 ký tự</p>
-                            <p id="has_number" class="invalid">Mật khẩu phải có ít nhất một chữ số</p>
-                            <p id="not_all_number" class="invalid" style="padding-bottom: 7px;">Mật khẩu không được hoàn toàn là số</p>
+                            <p id="length" class="invalid">Password must contain at least 8 characters</p>
+                            <p id="has_number" class="invalid">Password must have at least one number</p>
+                            <p id="not_all_number" class="invalid" style="padding-bottom: 7px;">Password cannot be entirely numbers</p>
                         </div>
                         <div class="mb-3 position-relative">
                             <input type="password" name="verify_password" id="confirm_password" class="form-control" placeholder="Verify Password" required>
@@ -134,79 +134,70 @@
             }
         }
         $(document).ready(function() {
-        // Hàm kiểm tra yêu cầu mật khẩu
+        // Function to check password requirements
         function checkPasswordRequirements() {
             var password = $('#password').val();
-            var confirm_password = $('#confirm_password').val();
-            var errors = []; // Mảng để chứa các lỗi
             var isValid = true;
-            // Reset trạng thái yêu cầu mật khẩu
-            $('.password-requirements p').removeClass('valid invalid');
-
-            // Kiểm tra độ dài (ít nhất 8 ký tự)
+            var errors = []; // Array to store errors
+            
+            // Reset password requirement status
+            $('.password-requirements p').removeClass('valid').addClass('invalid');
+            
+            // Check length (at least 8 characters)
             if (password.length < 8) {
                 isValid = false;
                 $('#length').removeClass('valid').addClass('invalid');
-                errors.push('Mật khẩu phải chứa ít nhất 8 ký tự.');
+                errors.push('Password must contain at least 8 characters.');
             } else {
                 $('#length').removeClass('invalid').addClass('valid');
             }
-
-        // Kiểm tra có ít nhất một chữ số
+            
+            // Check for at least one number
             if (!/\d/.test(password)) {
                 isValid = false;
                 $('#has_number').removeClass('valid').addClass('invalid');
-                errors.push('Mật khẩu phải có ít nhất một chữ số.');
+                errors.push('Password must have at least one number.');
             } else {
                 $('#has_number').removeClass('invalid').addClass('valid');
             }
-
-            // Kiểm tra mật khẩu không rỗng
-            if (password === '') {
+            
+            // Check password not empty
+            if (password.trim() === '') {
                 isValid = false;
                 $('#not_all_number').removeClass('valid').addClass('invalid');
-                errors.push('Mật khẩu không được để trống.');
-            } else if (/^\d+$/.test(password) ) { // Kiểm tra không hoàn toàn là số
+                errors.push('Password cannot be entirely numbers.');
+            } else if (/^\d+$/.test(password) ) { // Check not entirely numbers
                 isValid = false;
                 $('#not_all_number').removeClass('valid').addClass('invalid');
-                errors.push('Mật khẩu không được hoàn toàn là số.');
+                errors.push('Password cannot be entirely numbers.');
             } else {
                 $('#not_all_number').removeClass('invalid').addClass('valid');
             }
-
-            // Kiểm tra mật khẩu xác nhận
-            if (password !== confirm_password) {
-                isValid = false;
-                $('#confirm_password').removeClass('valid').addClass('invalid');
-                errors.push('Mật khẩu và Nhập lại mật khẩu không giống nhau!');
-            } else {
-                $('#confirm_password').removeClass('invalid').addClass('valid');
-            }
-
-            return { isValid: isValid, errors: errors };
+            
+            return isValid;
         }
 
-        // Kiểm tra mật khẩu mỗi khi người dùng nhập
+        // Check password requirements when user types
         $('#password, #confirm_password').on('input', function() {
             checkPasswordRequirements();
         });
 
-        // Kiểm tra mật khẩu trước khi gửi biểu mẫu
+        // Check password before submitting the form
         $('#form-login').on('submit', function(e) {
             var result = checkPasswordRequirements();
-            var isValid = result.isValid;
-            var errors = result.errors;
+            var isValid = result;
+            var errors = []; // No longer needed as result is boolean
 
-            // Nếu không hợp lệ, ngăn gửi biểu mẫu và hiển thị lỗi
+            // If not valid, prevent form submission and display error
             if (!isValid) {
-                e.preventDefault(); // Ngăn chặn gửi biểu mẫu
+                e.preventDefault(); // Prevent form submission
                 
-                if (errors.includes('Mật khẩu và Nhập lại mật khẩu không giống nhau!')){
-                    alert('Mật khẩu và Nhập lại mật khẩu không giống nhau!')
+                if (errors.includes('Password and Confirm Password do not match!')){
+                    alert('Password and Confirm Password do not match!')
                 }
                 else{
-                // Hiển thị lỗi, chỉ hiển thị lỗi không khớp mật khẩu nếu có
-                alert(errors.join('\n')); // Hiển thị danh sách các lỗi
+                // Display error, only show password mismatch error if present
+                alert(errors.join('\n')); // Display list of errors
                 }
             }
         });

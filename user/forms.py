@@ -15,8 +15,8 @@ class UserChangeForm(djangoUserChangeForm):
         fields = ('email',)
 
 class RegisterForm(forms.ModelForm):
-    password1 = forms.CharField(label='Mật khẩu', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Xác nhận mật khẩu', widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
     email = forms.EmailField(required=True)
     class Meta:
         model = User

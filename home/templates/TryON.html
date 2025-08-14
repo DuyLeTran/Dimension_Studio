@@ -429,7 +429,7 @@
             <div class="attempts-display">Attempts: {{ attempts }}</div>
         {% endif %}
         
-        <!-- Hiển thị Django messages -->
+        <!-- Display Django messages -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
@@ -500,7 +500,7 @@
                 <div class="step-header">
                     <div class="step-number">3</div>
                     <h4 class="step-title">View fitting results</h4>
-                    <i class="fas fa-info-circle info-icon" title="Kết quả sẽ được tạo bằng công nghệ AI trong vài giây"></i>
+                    <i class="fas fa-info-circle info-icon" title="The fitting results will be created by AI in a few seconds"></i>
                 </div>
                 
                 <div class="result-box" id="result-display">
@@ -521,74 +521,74 @@
 </form>
 
 <script>
-// Chỉ thêm JavaScript để hiển thị ảnh lên khung khi upload
+// JavaScript to display images in upload areas when uploading
 document.addEventListener('DOMContentLoaded', function() {
     const personFileInput = document.getElementById('person-file-input');
     const outfitFileInput = document.getElementById('outfit-file-input');
     
-    // Lưu trữ file gốc để có thể khôi phục khi cần
+    // Store original files to restore when needed
     let storedPersonFile = null;
     let storedOutfitFile = null;
     
-    // Xử lý upload ảnh person
+    // Handle person image upload
     personFileInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
-            storedPersonFile = file; // Lưu file gốc
+            storedPersonFile = file; // Store original file
             showImageInUploadArea('person-upload-area', file, personFileInput);
         }
     });
     
-    // Xử lý upload ảnh outfit
+    // Handle outfit image upload
     outfitFileInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
-            storedOutfitFile = file; // Lưu file gốc
+            storedOutfitFile = file; // Store original file
             showImageInUploadArea('outfit-upload-area', file, outfitFileInput);
         }
     });
     
-    // Xử lý click vào ảnh example person
+    // Handle click on person example images
     document.getElementById('person-examples').addEventListener('click', function(e) {
         const exampleWrapper = e.target.closest('.example-image-wrapper');
         if (exampleWrapper) {
             const imgSrc = exampleWrapper.querySelector('img').src;
-            // Tạo file từ ảnh example
+            // Create file from example image
             createFileFromImage(imgSrc, 'person.jpg', 'person-upload-area', personFileInput);
         }
     });
     
-    // Xử lý click vào ảnh example outfit
+    // Handle click on outfit example images
     document.getElementById('outfit-examples').addEventListener('click', function(e) {
         const exampleWrapper = e.target.closest('.example-image-wrapper');
         if (exampleWrapper) {
             const imgSrc = exampleWrapper.querySelector('img').src;
-            // Tạo file từ ảnh example
+            // Create file from example image
             createFileFromImage(imgSrc, 'outfit.jpg', 'outfit-upload-area', outfitFileInput);
         }
     });
     
-    // Hàm tạo file từ ảnh example
+    // Function to create file from example image
     function createFileFromImage(imgSrc, fileName, uploadAreaId, fileInput) {
         fetch(imgSrc)
             .then(response => response.blob())
             .then(blob => {
-                // Tạo file object từ blob
+                // Create file object from blob
                 const file = new File([blob], fileName, { type: 'image/jpeg' });
                 
-                // Lưu file gốc
+                // Store original file
                 if (uploadAreaId === 'person-upload-area') {
                     storedPersonFile = file;
                 } else if (uploadAreaId === 'outfit-upload-area') {
                     storedOutfitFile = file;
                 }
                 
-                // Gán file vào file input
+                // Assign file to file input
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 fileInput.files = dataTransfer.files;
                 
-                // Hiển thị ảnh trong khung upload
+                // Display image in upload area
                 showImageInUploadArea(uploadAreaId, file, fileInput);
             })
             .catch(error => {
@@ -596,24 +596,24 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Hàm hiển thị ảnh trong khung upload
+    // Function to display image in upload area
     function showImageInUploadArea(uploadAreaId, file, fileInput) {
         const uploadArea = document.getElementById(uploadAreaId);
         const reader = new FileReader();
         
         reader.onload = function(e) {
-            // Tạo container cho ảnh
+            // Create container for image
             const imageContainer = document.createElement('div');
             imageContainer.className = 'image-container';
             
-            // Tạo ảnh
+            // Create image
             const img = document.createElement('img');
             img.src = e.target.result;
             img.style.maxWidth = '100%';
             img.style.maxHeight = '100%';
             img.style.objectFit = 'contain';
             
-            // Tạo nút xóa
+            // Create delete button
             const deleteButton = document.createElement('button');
             deleteButton.className = 'delete-button';
             deleteButton.innerHTML = '<i class="fas fa-times"></i>';
@@ -623,24 +623,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteImage(uploadAreaId, fileInput);
             };
             
-            // Thêm ảnh và nút xóa vào container
+            // Add image and delete button to container
             imageContainer.appendChild(img);
             imageContainer.appendChild(deleteButton);
             
-            // Xóa nội dung cũ nhưng giữ file input
+            // Clear old content but keep file input
             uploadArea.innerHTML = '';
             uploadArea.appendChild(imageContainer);
-            uploadArea.appendChild(fileInput); // Giữ nguyên file input
+            uploadArea.appendChild(fileInput); // Keep file input
         };
         
         reader.readAsDataURL(file);
     }
     
-    // Hàm xóa ảnh
+    // Function to delete image
     function deleteImage(uploadAreaId, fileInput) {
         const uploadArea = document.getElementById(uploadAreaId);
         
-        // Xóa file input và file đã lưu
+        // Clear file input and stored file
         fileInput.value = '';
         if (uploadAreaId === 'person-upload-area') {
             storedPersonFile = null;
@@ -648,10 +648,10 @@ document.addEventListener('DOMContentLoaded', function() {
             storedOutfitFile = null;
         }
         
-        // Khôi phục lại giao diện upload ban đầu
+        // Restore original upload interface
         uploadArea.innerHTML = '';
         
-        // Tạo lại placeholder
+        // Recreate placeholder
         const placeholder = document.createElement('div');
         placeholder.className = 'upload-placeholder';
         
@@ -673,12 +673,12 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadArea.appendChild(fileInput);
     }
     
-    // Hàm hiển thị loading animation
+    // Function to show loading animation
     function showLoading() {
         const resultDisplay = document.getElementById('result-display');
         const runButton = document.getElementById('run-button');
         
-        // Hiển thị loading trong khung result
+        // Display loading in result area
         resultDisplay.innerHTML = `
             <div class="loading-container">
                 <div class="loading-spinner"></div>
@@ -687,34 +687,34 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        // Disable nút Run và thêm class loading
+        // Disable Run button and add loading class
         runButton.disabled = true;
         runButton.classList.add('loading');
         runButton.innerHTML = '<i class="fas fa-spinner"></i> Processing...';
     }
     
-    // Hàm ẩn loading animation
+    // Function to hide loading animation
     function hideLoading() {
         const runButton = document.getElementById('run-button');
         
-        // Enable lại nút Run và xóa class loading
+        // Re-enable Run button and remove loading class
         runButton.disabled = false;
         runButton.classList.remove('loading');
         runButton.innerHTML = '<i class="fas fa-play-circle"></i> Run';
     }
     
-    // Hàm hiển thị ảnh kết quả từ Python
+    // Function to display result image from Python
     function showResultImage(imageUrl) {
         const resultDisplay = document.getElementById('result-display');
         
-        // Ẩn loading trước khi hiển thị kết quả
+        // Hide loading before displaying result
         hideLoading();
         
-        // Tạo container cho ảnh kết quả
+        // Create container for result image
         const imageContainer = document.createElement('div');
         imageContainer.className = 'result-image-container';
         
-        // Tạo ảnh
+        // Create image
         const img = document.createElement('img');
         img.src = imageUrl;
         img.style.maxWidth = '100%';
@@ -722,7 +722,7 @@ document.addEventListener('DOMContentLoaded', function() {
         img.style.objectFit = 'cover';
         img.style.borderRadius = '8px';
         
-        // Tạo nút download (sử dụng a tag thay vì button để tránh submit form)
+        // Create download button (using a tag instead of button to avoid form submission)
         const downloadButton = document.createElement('a');
         downloadButton.className = 'download-button';
         downloadButton.innerHTML = '<i class="fas fa-download"></i>';
@@ -733,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
         downloadButton.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            // Tạo link download mới để tránh vấn đề với target="_blank"
+            // Create new download link to avoid issues with target="_blank"
             const downloadLink = document.createElement('a');
             downloadLink.href = imageUrl;
             downloadLink.download = 'tryon_result_' + new Date().getTime() + '.jpg';
@@ -742,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeChild(downloadLink);
         };
         
-        // Thêm ảnh và nút download vào container
+        // Add image and download button to container
         imageContainer.appendChild(img);
         imageContainer.appendChild(downloadButton);
         
@@ -750,16 +750,16 @@ document.addEventListener('DOMContentLoaded', function() {
         resultDisplay.appendChild(imageContainer);
     }
     
-    // Kiểm tra xem có ảnh kết quả từ Python không
+    // Check if there are result images from Python
     const resultImageUrl = '{{ result_image_url|default:"" }}';
     if (resultImageUrl) {
         showResultImage(resultImageUrl);
     } else {
-        // Ẩn loading nếu không có kết quả (trường hợp lỗi hoặc lần đầu vào trang)
+        // Hide loading if no result (error case or first time on page)
         hideLoading();
     }
-    
-    // Hiển thị lại ảnh input từ URL do Python truyền vào (giống cách hiển thị result)
+
+    // Display input images from URLs passed by Python (similar to result display)
     function showImageUrlInUploadArea(uploadAreaId, imageUrl, fileInput) {
         const uploadArea = document.getElementById(uploadAreaId);
         if (!uploadArea) return;
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
         img.style.objectFit = 'contain';
         img.style.borderRadius = '8px';
 
-        // Tạo nút xóa
+        // Create delete button
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-button';
         deleteButton.innerHTML = '<i class="fas fa-times"></i>';
@@ -794,7 +794,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Nếu Python truyền URL ảnh inputs, hiển thị lại vào khung
+    // If Python passes input image URLs, display them in upload areas
     const personImageUrl = '{{ person_image_url|default:"" }}';
     if (personImageUrl) {
         showImageUrlInUploadArea('person-upload-area', personImageUrl, document.getElementById('person-file-input'));
@@ -804,9 +804,9 @@ document.addEventListener('DOMContentLoaded', function() {
         showImageUrlInUploadArea('outfit-upload-area', outfitImageUrl, document.getElementById('outfit-file-input'));
     }
     
-    // Xử lý form submit để đảm bảo file được gửi đúng
+    // Handle form submit to ensure files are sent correctly
     document.getElementById('tryon-form').addEventListener('submit', function(e) {
-        // Kiểm tra xem có file nào được chọn không
+        // Check if any files are selected
         if (!storedPersonFile && !personFileInput.files.length) {
             e.preventDefault();
             alert('Please upload a person photo first.');
@@ -819,7 +819,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Nếu có file đã lưu nhưng file input trống, khôi phục file
+        // If there are stored files but file input is empty, restore files
         if (storedPersonFile && !personFileInput.files.length) {
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(storedPersonFile);
@@ -832,7 +832,7 @@ document.addEventListener('DOMContentLoaded', function() {
             outfitFileInput.files = dataTransfer.files;
         }
         
-        // Hiển thị loading animation khi submit form
+        // Show loading animation when submitting form
         showLoading();
     });
 });

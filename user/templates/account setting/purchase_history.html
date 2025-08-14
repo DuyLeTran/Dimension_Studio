@@ -279,17 +279,16 @@
         </div>
         {% endif %}
 
-        <h3 style="margin-bottom: 20px; border-bottom: 1px solid #dee2e6; padding-bottom: 10px;" class='text-center'>Lịch sử giao dịch</h3>
+        <h3 style="margin-bottom: 20px; border-bottom: 1px solid #dee2e6; padding-bottom: 10px;" class='text-center'>Transaction History</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>STT</th>
-                    <th>Gói</th>
-                    <th>Giá</th>
-                    <th>Ngày mua</th>
-                    <th>Ngày hết hạn</th>
-                    <th>Trạng thái</th>
-                    <th>Ảnh thanh toán</th>
+                    <th>Package</th>
+                    <th>Price</th>
+                    <th>Purchase Date</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                    <th>Payment Image</th>
                 </tr>
             </thead>
             <tbody>
@@ -302,11 +301,11 @@
                     <td>{{ purchase.expired_date|date:'d/m/Y H:i' }}</td>
                     <td>
                         {% if purchase.status == 'success' %}
-                            <span class="badge bg-success">Thành công</span>
+                            <span class="badge bg-success">Success</span>
                         {% elif purchase.status == 'failed' %}
-                            <span class="badge bg-danger">Thất bại</span>
+                            <span class="badge bg-danger">Failed</span>
                         {% else %}
-                            <span class="badge bg-warning text-dark">Đang xử lý</span>
+                            <span class="badge bg-warning text-dark">Processing</span>
                         {% endif %}
                     </td>
                     <td>

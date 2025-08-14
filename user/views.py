@@ -49,19 +49,19 @@ def register(request):
         if password == verify_password: 
             user = User.objects.create_user(email=email, password=password, is_verify=False)
 
-            # tạo uid và token
+            # Create uid and token
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
 
             
-            # tạo đường dẫn xác thực
+            # Create activation link
             activation_link = request.build_absolute_uri(
                 reverse('user:activate', kwargs={'uidb64': uid, 'token': token})
             )
 
             send_mail(
-                subject='Xác minh tài khoản Dimension Studio',
-                message=f'Nhấn vào link sau để kích hoạt tài khoản:\n{activation_link}',
+                subject='Dimension Studio Account Verification',
+                message=f'Click the following link to activate your account:\n{activation_link}',
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[email],
                 fail_silently=False,
@@ -84,7 +84,7 @@ def activate(request, uidb64, token):
         auth_login(request, user)
         return redirect('home:home')
     else:
-        return HttpResponse("Liên kết không hợp lệ hoặc đã hết hạn. Vui lòng đăng ký lại.")
+        return HttpResponse("Invalid or expired link. Please register again.")
 
 def forgot_password(request):
     if request.method == 'POST':
@@ -92,28 +92,28 @@ def forgot_password(request):
         try:
             user = User.objects.get(email=email)
             if user.is_verify:
-                # Tạo token reset password
+                # Create reset password token
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = default_token_generator.make_token(user)
                 
-                # Tạo link reset password
+                # Create reset password link
                 reset_link = request.build_absolute_uri(
                     reverse('user:reset_password', kwargs={'uidb64': uid, 'token': token})
                 )
                 
-                # Gửi email
+                # Send email
                 send_mail(
-                    subject='Đặt lại mật khẩu Dimension Studio',
-                    message=f'Nhấn vào link sau để đặt lại mật khẩu:\n{reset_link}',
+                    subject='Dimension Studio Password Reset',
+                    message=f'Click the following link to reset your password:\n{reset_link}',
                     from_email=settings.EMAIL_HOST_USER,
                     recipient_list=[email],
                     fail_silently=False,
                 )
-                messages.success(request, 'Link đặt lại mật khẩu đã được gửi đến email của bạn.')
+                messages.success(request, 'Password reset link has been sent to your email.')
             else:
-                messages.error(request, 'Tài khoản chưa được xác thực. Vui lòng xác thực tài khoản trước.')
+                messages.error(request, 'Account not verified. Please verify your account first.')
         except User.DoesNotExist:
-            messages.error(request, 'Không tìm thấy tài khoản với email này.')
+            messages.error(request, 'No account found with this email.')
         return redirect('user:forgot_password')
     return render(request, 'authentication/forgot_password.html')
 
@@ -132,13 +132,13 @@ def reset_password(request, uidb64, token):
             if password == confirm_password:
                 user.set_password(password)
                 user.save()
-                messages.success(request, 'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập lại.')
+                messages.success(request, 'Password has been reset successfully. Please login again.')
                 return redirect('user:login')
             else:
-                messages.error(request, 'Mật khẩu xác nhận không khớp.')
+                messages.error(request, 'Confirm password does not match.')
         return render(request, 'authentication/reset_password.html')
     else:
-        messages.error(request, 'Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.')
+        messages.error(request, 'Invalid or expired password reset link.')
         return redirect('user:forgot_password')
 
 def logout(request):

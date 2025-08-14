@@ -22,7 +22,7 @@ def try_on(request):
     attempts = request.user.profile.attempts
     subscription = request.user.profile.subscription
     if request.method == 'POST':
-        # 1. Nhận ảnh từ upload file nếu có
+        
         person_image = request.FILES.get('person_image')
         outfit_image = request.FILES.get('outfit_image')
 

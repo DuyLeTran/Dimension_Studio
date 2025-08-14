@@ -1,106 +1,106 @@
 # EXE201 - Virtual Try-On System
 
-## Mô tả dự án
-Hệ thống thử đồ ảo sử dụng AI để cho phép người dùng thử quần áo trên ảnh của mình.
+## Project Description
+AI-powered virtual try-on system that allows users to try clothes on their photos.
 
-## Công nghệ sử dụng
+## Technologies Used
 - **Backend**: Django (Python)
 - **Frontend**: HTML, CSS, JavaScript
 - **AI Model**: VITON-HD
 - **Database**: SQLite
 
-## Cài đặt và chạy dự án
+## Installation and Setup
 
-### Yêu cầu hệ thống
+### System Requirements
 - Python 3.8+
 - pip
 
-### Cài đặt
+### Installation
 1. Clone repository:
 ```bash
 git clone <repository-url>
 cd EXE201_frontend_backend
 ```
 
-2. Tạo virtual environment:
+2. Create virtual environment:
 ```bash
 python -m venv venv
-source venv/bin/activate  # Trên Linux/Mac
-# hoặc
-venv\Scripts\activate  # Trên Windows
+source venv/bin/activate  # On Linux/Mac
+# or
+venv\Scripts\activate  # On Windows
 ```
 
-3. Cài đặt dependencies:
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Chạy migrations:
+4. Run migrations:
 ```bash
 python manage.py migrate
 ```
 
-5. Tạo superuser (tùy chọn):
+5. Create superuser (optional):
 ```bash
 python manage.py createsuperuser
 ```
 
-6. Chạy server:
+6. Run server:
 ```bash
 python manage.py runserver
 ```
 
-Truy cập http://localhost:8000 để sử dụng ứng dụng.
+Visit http://localhost:8000 to use the application.
 
-## Cấu trúc dự án
+## Project Structure
 ```
 EXE201_frontend_backend/
-├── VTON/                 # Django settings và config
-├── home/                 # App chính
-├── user/                 # App quản lý user
+├── VTON/                 # Django settings and config
+├── home/                 # Main app
+├── user/                 # User management app
 ├── admin_site/           # Admin dashboard
-├── AI/                   # AI models và logic
+├── AI/                   # AI models and logic
 ├── media/                # Upload files
 ├── staticfiles/          # Static files
 └── requirements.txt      # Python dependencies
 ```
 
-## Tính năng chính
-- Đăng ký/Đăng nhập người dùng
-- Upload ảnh và thử đồ ảo
-- Quản lý profile và thanh toán
+## Main Features
+- User registration/login
+- Image upload and virtual try-on
+- Profile and payment management
 - Admin dashboard
 - AI-powered virtual try-on
 
-## Tác giả
+## Author
 EXE201 Team
 
 # AI Models
 
 ## VITON-HD Models
 
-Các file model AI đã được loại trừ khỏi Git repository do kích thước lớn (>100MB).
+AI model files have been excluded from the Git repository due to large size (>100MB).
 
-### Tải models
+### Download Models
 
-Để sử dụng hệ thống, bạn cần tải các file model sau vào thư mục `AI/VITON_HD/checkpoints/`:
+To use the system, you need to download the following model files to the `AI/VITON_HD/checkpoints/` directory:
 
 1. **alias_final.pth** (384MB) - Alias generation model
 2. **gmm_final.pth** (73MB) - Geometric matching model  
 3. **seg_final.pth** (132MB) - Segmentation model
 
-### Cách tải models:
+### How to Download Models:
 
-#### Option 1: Tải từ Google Drive
+#### Option 1: Download from Google Drive
 - Link: [VITON-HD Models](https://drive.google.com/drive/folders/...)
-- Tải và giải nén vào thư mục `AI/VITON_HD/checkpoints/`
+- Download and extract to the `AI/VITON_HD/checkpoints/` directory
 
-#### Option 2: Tải từ Hugging Face
+#### Option 2: Download from Hugging Face
 ```bash
-# Cài đặt huggingface_hub
+# Install huggingface_hub
 pip install huggingface_hub
 
-# Tải models
+# Download models
 python -c "
 from huggingface_hub import hf_hub_download
 import os
@@ -122,11 +122,11 @@ for model in models:
 "
 ```
 
-#### Option 3: Tải thủ công
-- Tải từ trang chủ VITON-HD: https://github.com/levindabhi/VITON-HD
-- Đặt các file vào thư mục `AI/VITON_HD/checkpoints/`
+#### Option 3: Manual Download
+- Download from VITON-HD homepage: https://github.com/levindabhi/VITON-HD
+- Place the files in the `AI/VITON_HD/checkpoints/` directory
 
-### Cấu trúc thư mục sau khi tải:
+### Directory Structure After Download:
 ```
 AI/VITON_HD/checkpoints/
 ├── alias_final.pth
@@ -134,7 +134,7 @@ AI/VITON_HD/checkpoints/
 └── seg_final.pth
 ```
 
-### Lưu ý:
-- Các file model này rất lớn (>500MB tổng cộng)
-- Đảm bảo có đủ dung lượng ổ cứng
-- Models này được sử dụng cho virtual try-on functionality 
+### Notes:
+- These model files are very large (>500MB total)
+- Ensure sufficient hard drive space
+- These models are used for virtual try-on functionality 
