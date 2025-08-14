@@ -1,6 +1,6 @@
 {% extends 'admin_base.html' %}
 {% load static %}
-
+{% load custom_filters %}
 {% block content %}
 <style>
     .stat-card {
@@ -53,6 +53,20 @@
     .stat-change.negative {
         color: #dc3545;
     }
+
+    .chart-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        margin-top: 2rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
 </style>
 
 <div class="row g-4">
@@ -103,8 +117,8 @@
                     <span>15%</span>
                 </div>
             </div>
-            <h3 class="stat-value">$24,500</h3>
-            <p class="stat-label">Monthly Revenue</p>
+            <h3 class="stat-value">{{ monthly_revenue_total|format_number }} vnđ</h3>
+            <p class="stat-label">Annual Revenue</p>
         </div>
     </div>
 
@@ -125,4 +139,154 @@
         </div>
     </div>
 </div>
+
+<!-- Charts Section -->
+<div class="row g-4 mt-4">
+    <!-- User Registrations Chart -->
+    <div class="col-12 col-lg-6">
+        <div class="chart-card p-4">
+            <h4 class="mb-3">User Registrations per Month</h4>
+            <div class="chart-container">
+                <canvas id="userRegistrationsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Revenue Chart -->
+    <div class="col-12 col-lg-6">
+        <div class="chart-card p-4">
+            <h4 class="mb-3">Monthly Revenue</h4>
+            <div class="chart-container">
+                <canvas id="monthlyRevenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Real data from Django backend
+const months = {{ month_names|safe }};
+const userData = {{ monthly_users|safe }};
+const revenueData = {{ monthly_revenue|safe }};
+const currentYear = {{ current_year }};
+
+// User Registrations Chart (Column Chart)
+const userRegistrationsCtx = document.getElementById('userRegistrationsChart').getContext('2d');
+const userRegistrationsChart = new Chart(userRegistrationsCtx, {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'New Users',
+            data: userData,
+            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+            borderRadius: 4,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: `User Registrations in ${currentYear}`
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Number of Users'
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Month'
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                }
+            }
+        }
+    }
+});
+
+// Monthly Revenue Chart (Line Chart)
+const monthlyRevenueCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+const monthlyRevenueChart = new Chart(monthlyRevenueCtx, {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Revenue (vnđ)',
+            data: revenueData,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: `Monthly Revenue in ${currentYear}`
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Revenue (vnđ)'
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                ticks: {
+                    callback: function(value) {
+                        return value.toLocaleString();
+                    }
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Month'
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                }
+            }
+        }
+    }
+});
+</script>
 {% endblock %}

@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from user.models import User, PurchaseHistory, Subscription
 from django.core.paginator import Paginator
-from django.db.models import Case, When, Value, IntegerField, Q, Sum
+from django.db.models import Case, When, Value, IntegerField, Q, Sum, Count
 from datetime import datetime, timedelta
 from django.contrib import messages
 from django.utils import timezone
+from django.db.models.functions import TruncMonth, ExtractYear
+import calendar
 
 def is_admin(user):
     return user.is_superuser   
@@ -25,13 +27,60 @@ def dashboard(request):
         Q(profile__subscription__name__iexact = 'Plus') |
         Q(profile__subscription__name__iexact = 'Premium')
     ).count() 
-    # print(users.filter(Q(profile__subscription__name__iexact='Free') & Q(profile__expired_date__gte=timezone.now())))
-    # print(users.profile.subscription.name)
+    
+    # Get current year
+    current_year = timezone.now().year
+    
+    # User registrations by month for current year
+    user_registrations = User.objects.filter(
+        date_joined__year=current_year
+    ).annotate(
+        month=TruncMonth('date_joined')
+    ).values('month').annotate(
+        count=Count('id')
+    ).order_by('month')
+    
+    # Initialize monthly user counts with 0
+    monthly_users = [0] * 12
+    for item in user_registrations:
+        month_index = item['month'].month - 1  # Convert to 0-based index
+        monthly_users[month_index] = item['count']
+    
+    # Monthly revenue for current year (from successful purchases)
+    monthly_revenue = PurchaseHistory.objects.filter(
+        purchase_date__year=current_year,
+        status='success'
+    ).annotate(
+        month=TruncMonth('purchase_date')
+    ).values('month').annotate(
+        total=Sum('price')
+    ).order_by('month')
+    
+    # Calculate total revenue for current year
+    total_revenue = PurchaseHistory.objects.filter(
+        purchase_date__year=current_year,
+        status='success'
+    ).aggregate(total=Sum('price'))['total'] or 0
+    
+    # Initialize monthly revenue with 0
+    monthly_revenue_data = [0] * 12
+    for item in monthly_revenue:
+        month_index = item['month'].month - 1  # Convert to 0-based index
+        monthly_revenue_data[month_index] = float(item['total'])
+    
+    # Get month names for chart labels
+    month_names = [calendar.month_abbr[i] for i in range(1, 13)]
+    
     context = {
-        'users': User.objects.all() ,
+        'users': User.objects.all(),
         'subscriptions': Subscription.objects.all(),
         'purchases': PurchaseHistory.objects.all(),
-        'active_subscriptions': active_subscriptions, # total active subscriptions
+        'active_subscriptions': active_subscriptions,
+        'monthly_users': monthly_users,
+        'monthly_revenue': monthly_revenue_data,
+        'month_names': month_names,
+        'current_year': current_year,
+        'monthly_revenue_total': total_revenue,
     }
     return render(request, 'dashboard.html', context)
 
