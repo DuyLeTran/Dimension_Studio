@@ -119,3 +119,16 @@ def update_profile_on_purchase_success(sender, instance, **kwargs):
         except PurchaseHistory.DoesNotExist:
             pass  # This is a new purchase, no need to update profile
 
+class TryOnHistory(models.Model):
+    '''
+    Try on history model stored the try on history of the user.
+    '''
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='try_on_history')
+    try_on_date = models.DateTimeField(default=timezone.now)
+    person_image_url = models.CharField(max_length=500, null=True, blank=True, help_text="Cloud URL of the person image")
+    outfit_image_url = models.CharField(max_length=500, null=True, blank=True, help_text="Cloud URL of the outfit image")
+    result_image_url = models.CharField(max_length=500, null=True, blank=True, help_text="Cloud URL of the result image")
+
+    def __str__(self):
+        return f"{self.user.email} - {self.try_on_date.strftime('%Y-%m-%d %H:%M')}"
+    

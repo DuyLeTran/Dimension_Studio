@@ -3,6 +3,7 @@
 {% block title %}Virtual Try-On - Dimension Studio{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     :root {
         --primary-blue: #1a73e8;
@@ -73,7 +74,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 25px;
+        margin-bottom: 15px;
         padding-bottom: 15px;
         border-bottom: 1px solid var(--border-color);
     }
@@ -104,79 +105,16 @@
         font-size: 1.1rem;
     }
 
-    .upload-box {
-        border: 2px dashed var(--border-color);
-        border-radius: 8px;
-        height: 250px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: var(--text-color-light);
-        font-size: 0.95em;
-        text-align: center;
-        transition: var(--transition);
-        margin-bottom: 25px;
-        cursor: pointer;
-        background-color: var(--white-bg);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .upload-box:hover {
-        border-color: var(--primary-blue);
-        background-color: rgba(26, 115, 232, 0.03);
-    }
-
-    .upload-icon {
-        font-size: 3.5rem;
-        margin-bottom: 15px;
-        color: var(--text-color-light);
-        transition: var(--transition);
-    }
-
-    .upload-box:hover .upload-icon {
-        color: var(--primary-blue);
-        transform: scale(1.1);
-    }
-
-    .upload-box span {
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    .upload-box input[type="file"] {
-        display: none;
-    }
-
     .selected-image-review {
-        margin-top: 20px;
-        display: none;
-    }
-
-    .selected-image-review.active {
-        display: block;
-    }
-
-    .review-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: var(--text-color-dark);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .review-image-container {
+        margin-bottom: 25px;
+        border: 2px solid var(--border-color);
         border-radius: 8px;
+        height: 300px;
         overflow: hidden;
-        height: 120px;
-        border: 1px solid var(--border-color);
         background-color: var(--white-bg);
     }
 
-    .review-image-container img {
+    .selected-image-review img {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -186,7 +124,7 @@
     .examples-title {
         font-size: 1.1rem;
         font-weight: 600;
-        margin: 25px 0 15px;
+        margin: 15px 0;
         color: var(--text-color-dark);
         display: flex;
         align-items: center;
@@ -209,6 +147,7 @@
         transition: var(--transition);
         position: relative;
         background-color: var(--light-gray-bg);
+        pointer-events: none;
     }
 
     .example-image-wrapper img {
@@ -242,11 +181,12 @@
         overflow: hidden;
     }
 
-    .result-box img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
+.result-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
     .result-controls {
         background-color: var(--white-bg);
@@ -254,53 +194,6 @@
         padding: 20px;
         margin-top: 20px;
         box-shadow: var(--card-shadow);
-    }
-
-    .control-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .control-group label {
-        color: var(--text-color-dark);
-        font-size: 0.95em;
-        min-width: 100px;
-    }
-
-    .control-group input[type="number"] {
-        width: 100px;
-        padding: 10px 12px;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        background-color: var(--white-bg);
-        color: var(--text-color-dark);
-        text-align: center;
-        -moz-appearance: textfield;
-    }
-
-    .control-group input[type="number"]::-webkit-outer-spin-button,
-    .control-group input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    .control-group input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--primary-blue);
-    }
-
-    .info-display {
-        background-color: var(--light-gray-bg);
-        color: var(--text-color-dark);
-        padding: 10px 15px;
-        border-radius: 6px;
-        font-size: 0.95em;
-        margin-top: 10px;
-        font-family: monospace;
     }
 
     .run-button {
@@ -319,6 +212,7 @@
         justify-content: center;
         align-items: center;
         gap: 10px;
+        pointer-events: none;
     }
 
     .run-button:hover {
@@ -342,59 +236,103 @@
         }
     }
 
-    /* Animation for uploaded image */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0.95); }
-        to { opacity: 1; transform: scale(1); }
+    /* Animation cursor */
+    #demo-cursor {
+        position: fixed;
+        width: 40px;
+        height: 40px;
+        z-index: 9999;
+        pointer-events: none;
+        transition: transform 0.2s, top 1s ease, left 1s ease;
+        transform: translate(-50%, -50%);
+        transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: none;
     }
-
-    .uploaded-image {
-        animation: fadeIn 0.5s ease;
+    
+    #demo-cursor .hand {
+        font-size: 32px;
+        color: var(--primary-blue);
+        filter: drop-shadow(0 0 4px rgba(0,0,0,0.3));
+        transition: transform 0.2s;
+    }
+    
+    #demo-cursor .click-effect {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--primary-blue);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    
+    #demo-cursor.clicking .hand {
+        transform: scale(0.8);
+    }
+    
+    #demo-cursor.clicking .click-effect {
+        animation: clickAnimation 0.6s ease-out;
+    }
+    
+    @keyframes clickAnimation {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 0;
+        }
+    }
+    
+    /* Loading spinner */
+    .spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 </style>
 
 <div class="virtual-tryon-page">
-    <h1 class="page-title">Trải Nghiệm Thử Đồ Ảo</h1>
-    <p class="page-subtitle">Tải lên ảnh của bạn và trang phục để xem chúng kết hợp với nhau như thế nào. Công nghệ AI của chúng tôi sẽ tạo ra hình ảnh thử đồ chân thực chỉ trong vài giây.</p>
+    <h1 class="page-title">Virtual Try-On Experience</h1>
+    <p class="page-subtitle">Select photos of people and outfits to see how they look together. Our AI technology generates realistic fitting images in seconds.</p>
     
     <div class="steps-container">
         <!-- Step 1 -->
         <div class="step-column">
             <div class="step-header">
                 <div class="step-number">1</div>
-                <h3 class="step-title">Tải ảnh người lên</h3>
+                <h3 class="step-title">Select a photo of a person</h3>
                 <i class="fas fa-info-circle info-icon" title="Ảnh nên có người đứng thẳng, rõ mặt và toàn thân"></i>
             </div>
             
-            <div class="upload-box" id="person-image-upload-box">
-                <input type="file" id="person-image-input" accept="image/*">
-                <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                <span>Kéo thả ảnh vào đây</span>
-                <span>hoặc</span>
-                <span>Nhấp để tải lên</span>
-            </div>
-            
             <div class="selected-image-review" id="person-review">
-                <h4 class="review-title"><i class="fas fa-check-circle"></i> Ảnh đã chọn</h4>
-                <div class="review-image-container">
-                    <img src="" alt="Ảnh người đã chọn" id="person-review-image">
-                </div>
+                <img src="" alt="Ảnh người đã chọn" id="person-review-image">
             </div>
             
-            <h4 class="examples-title"><i class="fas fa-images"></i> Ảnh ví dụ</h4>
+            <h4 class="examples-title"><i class="fas fa-images"></i> Example photo</h4>
             <div class="examples-grid" id="person-examples">
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 1"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 2"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 3"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 4"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 5"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1485178575877-1a13bf489dfe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 6"></div>
+                <div class="example-image-wrapper" data-set="1">
+                    <img src="/media/demo/1-1.jpg" alt="Ảnh người set 1">
+                </div>
+                <div class="example-image-wrapper" data-set="2">
+                    <img src="/media/demo/2-1.jpg" alt="Ảnh người set 2">
+                </div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 3"></div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 4"></div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 5"></div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh người ví dụ 6"></div>
             </div>
         </div>
         
@@ -402,33 +340,26 @@
         <div class="step-column">
             <div class="step-header">
                 <div class="step-number">2</div>
-                <h3 class="step-title">Tải ảnh trang phục lên</h3>
+                <h3 class="step-title">Choose a photo of the outfit</h3>
                 <i class="fas fa-info-circle info-icon" title="Ảnh trang phục nên được chụp trên nền trắng và rõ nét"></i>
             </div>
             
-            <div class="upload-box" id="garment-image-upload-box">
-                <input type="file" id="garment-image-input" accept="image/*">
-                <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                <span>Kéo thả ảnh vào đây</span>
-                <span>hoặc</span>
-                <span>Nhấp để tải lên</span>
-            </div>
-            
             <div class="selected-image-review" id="garment-review">
-                <h4 class="review-title"><i class="fas fa-check-circle"></i> Ảnh đã chọn</h4>
-                <div class="review-image-container">
-                    <img src="" alt="Ảnh trang phục đã chọn" id="garment-review-image">
-                </div>
+                <img src="" alt="Ảnh trang phục đã chọn" id="garment-review-image">
             </div>
             
-            <h4 class="examples-title"><i class="fas fa-images"></i> Ảnh ví dụ</h4>
+            <h4 class="examples-title"><i class="fas fa-images"></i> Example photo</h4>
             <div class="examples-grid" id="garment-examples">
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 1"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 2"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 3"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 4"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 5"></div>
-                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1520006403909-838d6b92c22e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 6"></div>
+                <div class="example-image-wrapper" data-set="1">
+                    <img src="/media/demo/1-2.jpg" alt="Ảnh áo set 1">
+                </div>
+                <div class="example-image-wrapper" data-set="2">
+                    <img src="/media/demo/2-2.jpg" alt="Ảnh áo set 2">
+                </div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 3"></div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 4"></div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 5"></div>
+                <div class="example-image-wrapper"><img src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Ảnh trang phục ví dụ 6"></div>
             </div>
         </div>
         
@@ -436,31 +367,19 @@
         <div class="step-column">
             <div class="step-header">
                 <div class="step-number">3</div>
-                <h3 class="step-title">Xem kết quả thử đồ</h3>
+                <h3 class="step-title">View fitting results</h3>
                 <i class="fas fa-info-circle info-icon" title="Kết quả sẽ được tạo bằng công nghệ AI trong vài giây"></i>
             </div>
             
             <div class="result-box" id="result-display">
                 <div class="result-placeholder">
                     <i class="fas fa-tshirt" style="font-size: 5rem; color: #e0e0e0;"></i>
-                    <p style="margin-top: 20px; font-size: 1.1rem;">Kết quả thử đồ sẽ hiển thị tại đây</p>
+                    <p style="margin-top: 20px; font-size: 1.1rem;">The fitting results will be displayed here.</p>
                 </div>
             </div>
             
-            <div class="result-controls">
-                <div class="control-group">
-                    <label for="seed-input">Seed:</label>
-                    <input type="number" id="seed-input" value="0" min="0">
-                    <input type="checkbox" id="random-seed-checkbox" checked>
-                    <label for="random-seed-checkbox">Seed ngẫu nhiên</label>
-                </div>
                 
-                <div class="control-group">
-                    <label>Seed đã dùng:</label>
-                    <div id="seed-used-display" class="info-display">Chưa có dữ liệu</div>
-                </div>
-                
-                <button class="run-button">
+                <button class="run-button" id="run-button">
                     <i class="fas fa-play-circle"></i> Chạy Thử Đồ
                 </button>
             </div>
@@ -468,141 +387,195 @@
     </div>
 </div>
 
+<!-- Animated cursor for demo -->
+<div id="demo-cursor">
+    <div class="hand"><i class="fas fa-hand-pointer"></i></div>
+    <div class="click-effect"></div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Function to handle image selection (upload or example)
-        function setupImageSelection(uploadBoxId, inputId, examplesGridId, reviewContainerId, reviewImageId) {
-            const uploadBox = document.getElementById(uploadBoxId);
-            const fileInput = document.getElementById(inputId);
-            const examplesGrid = document.getElementById(examplesGridId);
-            const reviewContainer = document.getElementById(reviewContainerId);
-            const reviewImage = document.getElementById(reviewImageId);
-            
-            // Handle click to upload
-            uploadBox.addEventListener('click', () => {
-                fileInput.click();
+        // Demo variables
+        let isDemoRunning = true;
+        let currentSet = 1;
+        const demoCursor = document.getElementById('demo-cursor');
+        
+        // Get elements for demo actions
+        const personSet1 = document.querySelector('#person-examples .example-image-wrapper[data-set="1"]');
+        const personSet2 = document.querySelector('#person-examples .example-image-wrapper[data-set="2"]');
+        const garmentSet1 = document.querySelector('#garment-examples .example-image-wrapper[data-set="1"]');
+        const garmentSet2 = document.querySelector('#garment-examples .example-image-wrapper[data-set="2"]');
+        const runButton = document.getElementById('run-button');
+        const resultDisplay = document.getElementById('result-display');
+
+        // Function to programmatically select an image
+        function selectImage(element) {
+            // Deselect all images in the same grid
+            const grid = element.closest('.examples-grid');
+            grid.querySelectorAll('.example-image-wrapper').forEach(img => {
+                img.classList.remove('selected');
             });
             
-            // Handle file input change
-            fileInput.addEventListener('change', (event) => {
-                if (event.target.files.length > 0) {
-                    const file = event.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Display the uploaded image in the upload box
-                        uploadBox.innerHTML = `<img src="${e.target.result}" class="uploaded-image" alt="Uploaded Image">`;
-                        
-                        // Display the image in the review section
-                        reviewImage.src = e.target.result;
-                        reviewContainer.classList.add('active');
-                        
-                        // Deselect all examples when a new file is uploaded
-                        examplesGrid.querySelectorAll('.example-image-wrapper').forEach(imgWrapper => {
-                            imgWrapper.classList.remove('selected');
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+            // Select the target element
+            element.classList.add('selected');
             
-            // Handle example image selection
-            examplesGrid.addEventListener('click', (event) => {
-                const selectedImageWrapper = event.target.closest('.example-image-wrapper');
-                if (selectedImageWrapper) {
-                    // Deselect previous examples
-                    examplesGrid.querySelectorAll('.example-image-wrapper').forEach(imgWrapper => {
-                        imgWrapper.classList.remove('selected');
-                    });
+            // Update the review image
+            const reviewId = grid.id.replace('-examples', '-review-image');
+            const reviewImg = document.getElementById(reviewId);
+            if (reviewImg) {
+                const imgSrc = element.querySelector('img').src;
+                reviewImg.src = imgSrc;
+                reviewImg.style.display = 'block';
+            }
+        }
+
+        // Function to simulate click with animation
+        function simulateClick(element) {
+            return new Promise((resolve) => {
+                // Move cursor to element
+                const rect = element.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                
+                demoCursor.style.left = `${x}px`;
+                demoCursor.style.top = `${y}px`;
+                demoCursor.style.display = 'block';
+                
+                // Add clicking animation
+                setTimeout(() => {
+                    demoCursor.classList.add('clicking');
                     
-                    // Select current example
-                    selectedImageWrapper.classList.add('selected');
-                    
-                    // Display the selected example image in the upload box
-                    const imgSrc = selectedImageWrapper.querySelector('img').src;
-                    uploadBox.innerHTML = `<img src="${imgSrc}" class="uploaded-image" alt="Selected Example">`;
-                    
-                    // Display the image in the review section
-                    reviewImage.src = imgSrc;
-                    reviewContainer.classList.add('active');
-                    
-                    // Clear file input if an example is selected
-                    fileInput.value = '';
-                }
+                    // Programmatically select the image
+                    setTimeout(() => {
+                        selectImage(element);
+                        
+                        // Remove clicking animation
+                        setTimeout(() => {
+                            demoCursor.classList.remove('clicking');
+                            resolve();
+                        }, 300);
+                    }, 300);
+                }, 1000);
             });
         }
+
+// Function to generate and display result
+function generateResult(set) {
+    return new Promise((resolve) => {
+        // Show loading state in result box
+        const resultPlaceholder = document.createElement('div');
+        resultPlaceholder.className = 'result-placeholder';
+        resultPlaceholder.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;';
+        resultPlaceholder.innerHTML = '<span class="spinner"></span><p style="margin-top:10px;">Generating result...</p>';
         
-        // Set up for person image
-        setupImageSelection(
-            'person-image-upload-box', 
-            'person-image-input', 
-            'person-examples',
-            'person-review',
-            'person-review-image'
-        );
-        
-        // Set up for garment image
-        setupImageSelection(
-            'garment-image-upload-box', 
-            'garment-image-input', 
-            'garment-examples',
-            'garment-review',
-            'garment-review-image'
-        );
-        
-        // Handle Random Seed checkbox
-        const seedInput = document.getElementById('seed-input');
-        const randomSeedCheckbox = document.getElementById('random-seed-checkbox');
-        
-        randomSeedCheckbox.addEventListener('change', () => {
-            seedInput.disabled = randomSeedCheckbox.checked;
-            if (randomSeedCheckbox.checked) {
-                seedInput.value = 0;
-            }
-        });
-        
-        // Handle Run button click
-        const runButton = document.querySelector('.run-button');
-        const resultDisplay = document.getElementById('result-display');
-        const seedUsedDisplay = document.getElementById('seed-used-display');
-        
-        runButton.addEventListener('click', () => {
-            // Show loading state
-            runButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-            runButton.disabled = true;
+        resultDisplay.innerHTML = ''; // Clear previous content
+        resultDisplay.appendChild(resultPlaceholder); // Append the loading state
+
+        // Determine result image path based on set
+        let resultImgSrc;
+        if (set === 1) {
+            resultImgSrc = "/media/demo/1-3.jpg";
+        } else if (set === 2) {
+            resultImgSrc = "/media/demo/2-3.jpg";
+        } else {
+            resultImgSrc = "default-output.jpg";
+        }
+
+        // Simulate processing delay
+        setTimeout(() => {
+            const img = document.createElement('img');
+            img.src = resultImgSrc;
+            img.alt = "Fitting result";
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
             
-            // Simulate processing delay
-            setTimeout(() => {
-                // Generate a random result image for demo
-                const demoImages = [
-                    'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                    'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'
-                ];
-                
-                const randomIndex = Math.floor(Math.random() * demoImages.length);
-                const resultImg = document.createElement('img');
-                resultImg.src = demoImages[randomIndex];
-                resultImg.alt = "Kết quả thử đồ";
-                resultImg.style.maxWidth = '100%';
-                resultImg.style.maxHeight = '100%';
-                
-                resultDisplay.innerHTML = '';
-                resultDisplay.appendChild(resultImg);
-                
-                // Update seed used display
-                let currentSeed = seedInput.value;
-                if (randomSeedCheckbox.checked) {
-                    currentSeed = Math.floor(Math.random() * 1000000);
-                    seedUsedDisplay.textContent = currentSeed;
-                } else {
-                    seedUsedDisplay.textContent = currentSeed;
-                }
-                
-                // Reset button
-                runButton.innerHTML = '<i class="fas fa-play-circle"></i> Chạy Thử Đồ';
-                runButton.disabled = false;
-            }, 2000);
-        });
+            img.onload = function() {
+                resultDisplay.innerHTML = ''; // Clear the loading state
+                resultDisplay.appendChild(img); // Append the new image
+                resolve();
+            };
+
+            img.onerror = function() {
+                resultDisplay.innerHTML = '<div class="result-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;"><i class="fas fa-exclamation-triangle" style="font-size:3rem;color:#ff6b6b;"></i><p style="margin-top:15px;">Could not load result image</p></div>';
+                resolve();
+            };
+        }, 2000); // Tăng thời gian chờ lên 2 giây để thấy rõ hiệu ứng
+    });
+}
+
+// Function to run the demo for a specific set
+async function runDemoForSet(set) {
+    if (!isDemoRunning) return;
+    
+    currentSet = set;
+    
+    // Select person image
+    const personElement = set === 1 ? personSet1 : personSet2;
+    await simulateClick(personElement);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Select garment image
+    const garmentElement = set === 1 ? garmentSet1 : garmentSet2;
+    await simulateClick(garmentElement);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // **Bước mới: Mô phỏng con trỏ chuột di chuyển và click vào nút "Chạy Thử Đồ"**
+    const rect = runButton.getBoundingClientRect();
+    demoCursor.style.left = `${rect.left + rect.width/2}px`;
+    demoCursor.style.top = `${rect.top + rect.height/2}px`;
+    demoCursor.style.display = 'block';
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // **Thực hiện click ảo**
+    demoCursor.classList.add('clicking');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    demoCursor.classList.remove('clicking');
+    
+    // **Chỉ sau khi click, mới thay đổi trạng thái nút**
+    runButton.innerHTML = '<span class="spinner"></span> Đang Xử Lý...';
+    runButton.disabled = true;
+    
+    // Generate and show result
+    await generateResult(set);
+    
+    // **Thay đổi trạng thái nút trở lại "Chạy Thử Đồ"**
+    runButton.innerHTML = '<i class="fas fa-play-circle"></i> Chạy Thử Đồ';
+    runButton.disabled = false;
+    
+    // Wait before next set
+    await new Promise(resolve => setTimeout(resolve, 5000));
+}
+
+        // Function to run the demo cycle
+        async function runDemoCycle() {
+            while (isDemoRunning) {
+                await runDemoForSet(1);
+                if (!isDemoRunning) break;
+                await runDemoForSet(2);
+                if (!isDemoRunning) break;
+            }
+        }
+
+        // Initialize demo
+        function initDemo() {
+            // Hide cursor initially
+            demoCursor.style.display = 'none';
+            
+            // Make sure the example images exist
+            if (personSet1 && personSet2 && garmentSet1 && garmentSet2 && runButton && resultDisplay) {
+                // Start demo after short delay
+                setTimeout(() => {
+                    runDemoCycle();
+                }, 1000);
+            } else {
+                console.error("Could not find all required elements for demo");
+            }
+        }
+
+        // Start the demo
+        initDemo();
     });
 </script>
 {% endblock %}

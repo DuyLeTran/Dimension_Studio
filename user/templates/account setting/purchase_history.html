@@ -265,7 +265,7 @@
         <h2>{{ user.get_full_name|default:user.email }}</h2>
         <a href="{% url 'user:profile' %}">Profile</a>
         <a class="active"href="{% url 'user:purchase_history' %}">Purchase history</a>
-        
+        <a href="{% url 'user:try_on_history' %}">Try On history</a>
     </div>
 
     <div class="main-content">

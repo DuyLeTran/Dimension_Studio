@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.utils.translation import gettext_lazy as _
-from .models import User, Profile, Subscription, PurchaseHistory
+from .models import User, Profile, Subscription, PurchaseHistory, TryOnHistory
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
@@ -210,3 +210,8 @@ def payment(request, subscription_id):
     return render(request, 'account setting/payment.html', {
         'subscription': subscription
     })
+
+@login_required
+def try_on_history(request):
+    all_try_on = TryOnHistory.objects.filter(user=request.user)
+    return render(request, 'account setting/try_on_history.html', {'all_try_on': all_try_on})

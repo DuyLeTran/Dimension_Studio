@@ -1,0 +1,842 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Virtual Try-On - Dimension Studio{% endblock %}
+
+{% block content %}
+<style>
+    .virtual-tryon-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .page-title {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 2.5rem;
+        font-weight: 300;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .attempts-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        white-space: nowrap;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .alert {
+        padding: 20px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .alert-error {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
+    }
+    
+    .alert-success {
+        background: #e8f5e8;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+    
+    .alert-warning {
+        background: #fff3e0;
+        color: #ef6c00;
+        border: 1px solid #ffcc02;
+    }
+    
+    .alert-info {
+        background: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #bbdefb;
+    }
+    
+    .steps-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+    
+    .step-column {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+    }
+    
+    .step-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+    }
+    
+    .step-number {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .step-title {
+        margin: 0;
+        color: #333;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+    
+    .info-icon {
+        color: #667eea;
+        cursor: help;
+        margin-left: auto;
+    }
+    
+    .upload-area {
+        border: 2px dashed #ddd;
+        border-radius: 10px;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .upload-area:hover {
+        border-color: #667eea;
+        background: #f0f4ff;
+    }
+    
+    .upload-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .upload-placeholder i {
+        font-size: 3rem;
+        color: #ccc;
+    }
+    
+    .upload-placeholder p {
+        margin: 0;
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .small-text {
+        font-size: 0.9rem !important;
+        color: #999 !important;
+    }
+    
+    .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .delete-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ff4757;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+    
+    .delete-button:hover {
+        background: #ff3742;
+        transform: scale(1.1);
+    }
+    
+    .image-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .examples-title {
+        margin: 20px 0 15px 0;
+        color: #333;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .examples-grid {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+    
+    .example-image-wrapper {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        height: 120px;
+        width: calc(50% - 7.5px);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .example-image-wrapper:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+    
+    .example-image-wrapper.selected {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+    }
+    
+    .example-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .result-box {
+        border: 2px dashed #ddd;
+        border-radius: 10px;
+        padding: 40px 20px;
+        text-align: center;
+        background: #fafafa;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+        color: #667eea;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .loading-subtext {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
+        opacity: 0.8;
+    }
+    
+    .run-button.loading {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .run-button.loading i {
+        animation: spin 1s linear infinite;
+    }
+    
+    .result-image-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .download-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        z-index: 10;
+        opacity: 0;
+        transform: scale(0.8);
+        text-decoration: none;
+        outline: none;
+    }
+    
+    .result-image-container:hover .download-button {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .download-button:hover {
+        background: #218838;
+        transform: scale(1.1);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .download-button:active {
+        transform: scale(0.95);
+    }
+    
+    .result-controls {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .run-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .run-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .run-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .run-button i {
+        font-size: 1.2rem;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .steps-container {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .examples-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Debug: Current URL: {{ request.path }} -->
+<!-- Debug: CSRF Token: {{ csrf_token }} -->
+<form method="POST" action="{% url 'home:try_on' %}" enctype="multipart/form-data" id="tryon-form">
+    {% csrf_token %}
+    <div class="virtual-tryon-page">
+        <h1 class="page-title">Virtual Try-On</h1>
+        {% if user.profile.subscription.name == 'Premium' %}
+            <div class="attempts-display">Attempts: &infin;</div>
+        {% else %}
+            <div class="attempts-display">Attempts: {{ attempts }}</div>
+        {% endif %}
+        
+        <!-- Hiển thị Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="steps-container">
+            <!-- Step 1: Upload Person Photo -->
+            <div class="step-column">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h4 class="step-title">Upload person photo</h4>
+                    <i class="fas fa-info-circle info-icon" title="Upload a clear photo of a person (full body recommended)"></i>
+                </div>
+                
+                <div class="upload-area" id="person-upload-area">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-user-plus"></i>
+                        <p>Click to upload person photo</p>
+                        <p class="small-text">or drag and drop here</p>
+                    </div>
+                    <input type="file" class="file-input" accept="image/*" name="person_image" id="person-file-input">
+                </div>
+                
+                <h4 class="examples-title"><i class="fas fa-images"></i> Example photos</h4>
+                <div class="examples-grid" id="person-examples">
+                    <div class="example-image-wrapper" data-src="/media/demo/1-1.jpg">
+                        <img src="/media/demo/1-1.jpg" alt="Example person 1">
+                    </div>
+                    <div class="example-image-wrapper" data-src="/media/demo/2-1.jpg">
+                        <img src="/media/demo/2-1.jpg" alt="Example person 2">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Upload Outfit Photo -->
+            <div class="step-column">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h4 class="step-title">Upload outfit photo</h4>
+                    <i class="fas fa-info-circle info-icon" title="Upload a clear photo of clothing item"></i>
+                </div>
+                
+                <div class="upload-area" id="outfit-upload-area">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-tshirt"></i>
+                        <p>Click to upload outfit photo</p>
+                        <p class="small-text">or drag and drop here</p>
+                    </div>
+                    <input type="file" class="file-input" accept="image/*" name="outfit_image" id="outfit-file-input">
+                </div>
+                
+                <h4 class="examples-title"><i class="fas fa-images"></i> Example photos</h4>
+                <div class="examples-grid" id="outfit-examples">
+                    <div class="example-image-wrapper" data-src="/media/demo/1-2.jpg">
+                        <img src="/media/demo/1-2.jpg" alt="Example outfit 1">
+                    </div>
+                    <div class="example-image-wrapper" data-src="/media/demo/2-2.jpg">
+                        <img src="/media/demo/2-2.jpg" alt="Example outfit 2">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: View Results -->
+            <div class="step-column">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h4 class="step-title">View fitting results</h4>
+                    <i class="fas fa-info-circle info-icon" title="Kết quả sẽ được tạo bằng công nghệ AI trong vài giây"></i>
+                </div>
+                
+                <div class="result-box" id="result-display">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-tshirt" style="font-size: 5rem; color: #e0e0e0;"></i>
+                        <p style="margin-top: 20px; font-size: 1.1rem;">The fitting results will be displayed here.</p>
+                    </div>
+                </div>
+                
+                <div class="result-controls">
+                    <button type="submit" class="run-button" id="run-button">
+                        <i class="fas fa-play-circle"></i> Run
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+// Chỉ thêm JavaScript để hiển thị ảnh lên khung khi upload
+document.addEventListener('DOMContentLoaded', function() {
+    const personFileInput = document.getElementById('person-file-input');
+    const outfitFileInput = document.getElementById('outfit-file-input');
+    
+    // Lưu trữ file gốc để có thể khôi phục khi cần
+    let storedPersonFile = null;
+    let storedOutfitFile = null;
+    
+    // Xử lý upload ảnh person
+    personFileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            storedPersonFile = file; // Lưu file gốc
+            showImageInUploadArea('person-upload-area', file, personFileInput);
+        }
+    });
+    
+    // Xử lý upload ảnh outfit
+    outfitFileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            storedOutfitFile = file; // Lưu file gốc
+            showImageInUploadArea('outfit-upload-area', file, outfitFileInput);
+        }
+    });
+    
+    // Xử lý click vào ảnh example person
+    document.getElementById('person-examples').addEventListener('click', function(e) {
+        const exampleWrapper = e.target.closest('.example-image-wrapper');
+        if (exampleWrapper) {
+            const imgSrc = exampleWrapper.querySelector('img').src;
+            // Tạo file từ ảnh example
+            createFileFromImage(imgSrc, 'person.jpg', 'person-upload-area', personFileInput);
+        }
+    });
+    
+    // Xử lý click vào ảnh example outfit
+    document.getElementById('outfit-examples').addEventListener('click', function(e) {
+        const exampleWrapper = e.target.closest('.example-image-wrapper');
+        if (exampleWrapper) {
+            const imgSrc = exampleWrapper.querySelector('img').src;
+            // Tạo file từ ảnh example
+            createFileFromImage(imgSrc, 'outfit.jpg', 'outfit-upload-area', outfitFileInput);
+        }
+    });
+    
+    // Hàm tạo file từ ảnh example
+    function createFileFromImage(imgSrc, fileName, uploadAreaId, fileInput) {
+        fetch(imgSrc)
+            .then(response => response.blob())
+            .then(blob => {
+                // Tạo file object từ blob
+                const file = new File([blob], fileName, { type: 'image/jpeg' });
+                
+                // Lưu file gốc
+                if (uploadAreaId === 'person-upload-area') {
+                    storedPersonFile = file;
+                } else if (uploadAreaId === 'outfit-upload-area') {
+                    storedOutfitFile = file;
+                }
+                
+                // Gán file vào file input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+                
+                // Hiển thị ảnh trong khung upload
+                showImageInUploadArea(uploadAreaId, file, fileInput);
+            })
+            .catch(error => {
+                console.error('Error creating file from example:', error);
+            });
+    }
+    
+    // Hàm hiển thị ảnh trong khung upload
+    function showImageInUploadArea(uploadAreaId, file, fileInput) {
+        const uploadArea = document.getElementById(uploadAreaId);
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Tạo container cho ảnh
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'image-container';
+            
+            // Tạo ảnh
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            img.style.objectFit = 'contain';
+            
+            // Tạo nút xóa
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-button';
+            deleteButton.innerHTML = '<i class="fas fa-times"></i>';
+            deleteButton.title = 'Delete image';
+            deleteButton.onclick = function(e) {
+                e.stopPropagation();
+                deleteImage(uploadAreaId, fileInput);
+            };
+            
+            // Thêm ảnh và nút xóa vào container
+            imageContainer.appendChild(img);
+            imageContainer.appendChild(deleteButton);
+            
+            // Xóa nội dung cũ nhưng giữ file input
+            uploadArea.innerHTML = '';
+            uploadArea.appendChild(imageContainer);
+            uploadArea.appendChild(fileInput); // Giữ nguyên file input
+        };
+        
+        reader.readAsDataURL(file);
+    }
+    
+    // Hàm xóa ảnh
+    function deleteImage(uploadAreaId, fileInput) {
+        const uploadArea = document.getElementById(uploadAreaId);
+        
+        // Xóa file input và file đã lưu
+        fileInput.value = '';
+        if (uploadAreaId === 'person-upload-area') {
+            storedPersonFile = null;
+        } else if (uploadAreaId === 'outfit-upload-area') {
+            storedOutfitFile = null;
+        }
+        
+        // Khôi phục lại giao diện upload ban đầu
+        uploadArea.innerHTML = '';
+        
+        // Tạo lại placeholder
+        const placeholder = document.createElement('div');
+        placeholder.className = 'upload-placeholder';
+        
+        if (uploadAreaId === 'person-upload-area') {
+            placeholder.innerHTML = `
+                <i class="fas fa-user-plus"></i>
+                <p>Click to upload person photo</p>
+                <p class="small-text">or drag and drop here</p>
+            `;
+        } else if (uploadAreaId === 'outfit-upload-area') {
+            placeholder.innerHTML = `
+                <i class="fas fa-tshirt"></i>
+                <p>Click to upload outfit photo</p>
+                <p class="small-text">or drag and drop here</p>
+            `;
+        }
+        
+        uploadArea.appendChild(placeholder);
+        uploadArea.appendChild(fileInput);
+    }
+    
+    // Hàm hiển thị loading animation
+    function showLoading() {
+        const resultDisplay = document.getElementById('result-display');
+        const runButton = document.getElementById('run-button');
+        
+        // Hiển thị loading trong khung result
+        resultDisplay.innerHTML = `
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Processing your request...</p>
+                <p class="loading-subtext">It might take a while, please be patient</p>
+            </div>
+        `;
+        
+        // Disable nút Run và thêm class loading
+        runButton.disabled = true;
+        runButton.classList.add('loading');
+        runButton.innerHTML = '<i class="fas fa-spinner"></i> Processing...';
+    }
+    
+    // Hàm ẩn loading animation
+    function hideLoading() {
+        const runButton = document.getElementById('run-button');
+        
+        // Enable lại nút Run và xóa class loading
+        runButton.disabled = false;
+        runButton.classList.remove('loading');
+        runButton.innerHTML = '<i class="fas fa-play-circle"></i> Run';
+    }
+    
+    // Hàm hiển thị ảnh kết quả từ Python
+    function showResultImage(imageUrl) {
+        const resultDisplay = document.getElementById('result-display');
+        
+        // Ẩn loading trước khi hiển thị kết quả
+        hideLoading();
+        
+        // Tạo container cho ảnh kết quả
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'result-image-container';
+        
+        // Tạo ảnh
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '8px';
+        
+        // Tạo nút download (sử dụng a tag thay vì button để tránh submit form)
+        const downloadButton = document.createElement('a');
+        downloadButton.className = 'download-button';
+        downloadButton.innerHTML = '<i class="fas fa-download"></i>';
+        downloadButton.title = 'Download result image';
+        downloadButton.href = imageUrl;
+        downloadButton.download = 'tryon_result_' + new Date().getTime() + '.jpg';
+        downloadButton.target = '_blank';
+        downloadButton.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            // Tạo link download mới để tránh vấn đề với target="_blank"
+            const downloadLink = document.createElement('a');
+            downloadLink.href = imageUrl;
+            downloadLink.download = 'tryon_result_' + new Date().getTime() + '.jpg';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        };
+        
+        // Thêm ảnh và nút download vào container
+        imageContainer.appendChild(img);
+        imageContainer.appendChild(downloadButton);
+        
+        resultDisplay.innerHTML = '';
+        resultDisplay.appendChild(imageContainer);
+    }
+    
+    // Kiểm tra xem có ảnh kết quả từ Python không
+    const resultImageUrl = '{{ result_image_url|default:"" }}';
+    if (resultImageUrl) {
+        showResultImage(resultImageUrl);
+    } else {
+        // Ẩn loading nếu không có kết quả (trường hợp lỗi hoặc lần đầu vào trang)
+        hideLoading();
+    }
+    
+    // Hiển thị lại ảnh input từ URL do Python truyền vào (giống cách hiển thị result)
+    function showImageUrlInUploadArea(uploadAreaId, imageUrl, fileInput) {
+        const uploadArea = document.getElementById(uploadAreaId);
+        if (!uploadArea) return;
+        
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'image-container';
+        
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        img.style.objectFit = 'contain';
+        img.style.borderRadius = '8px';
+
+        // Tạo nút xóa
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-button';
+        deleteButton.innerHTML = '<i class="fas fa-times"></i>';
+        deleteButton.title = 'Delete image';
+        deleteButton.onclick = function(e) {
+            e.stopPropagation();
+            deleteImage(uploadAreaId, fileInput);
+        };
+
+        imageContainer.appendChild(img);
+        imageContainer.appendChild(deleteButton);
+        
+        uploadArea.innerHTML = '';
+        uploadArea.appendChild(imageContainer);
+        if (fileInput && !uploadArea.contains(fileInput)) {
+            uploadArea.appendChild(fileInput);
+        }
+    }
+
+    // Nếu Python truyền URL ảnh inputs, hiển thị lại vào khung
+    const personImageUrl = '{{ person_image_url|default:"" }}';
+    if (personImageUrl) {
+        showImageUrlInUploadArea('person-upload-area', personImageUrl, document.getElementById('person-file-input'));
+    }
+    const outfitImageUrl = '{{ outfit_image_url|default:"" }}';
+    if (outfitImageUrl) {
+        showImageUrlInUploadArea('outfit-upload-area', outfitImageUrl, document.getElementById('outfit-file-input'));
+    }
+    
+    // Xử lý form submit để đảm bảo file được gửi đúng
+    document.getElementById('tryon-form').addEventListener('submit', function(e) {
+        // Kiểm tra xem có file nào được chọn không
+        if (!storedPersonFile && !personFileInput.files.length) {
+            e.preventDefault();
+            alert('Please upload a person photo first.');
+            return;
+        }
+        
+        if (!storedOutfitFile && !outfitFileInput.files.length) {
+            e.preventDefault();
+            alert('Please upload an outfit photo first.');
+            return;
+        }
+        
+        // Nếu có file đã lưu nhưng file input trống, khôi phục file
+        if (storedPersonFile && !personFileInput.files.length) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(storedPersonFile);
+            personFileInput.files = dataTransfer.files;
+        }
+        
+        if (storedOutfitFile && !outfitFileInput.files.length) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(storedOutfitFile);
+            outfitFileInput.files = dataTransfer.files;
+        }
+        
+        // Hiển thị loading animation khi submit form
+        showLoading();
+    });
+});
+</script>
+
+
+{% endblock %} 

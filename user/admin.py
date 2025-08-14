@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as djangoUserAdmin
-from .models import User, Profile, Subscription, PurchaseHistory
+from .models import User, Profile, Subscription, PurchaseHistory, TryOnHistory
 from .forms import UserCreationForm, UserChangeForm
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
@@ -72,3 +72,10 @@ class PurchaseHistoryAdmin(admin.ModelAdmin):
         )
     colored_status.short_description = 'Status'
 admin.site.register(PurchaseHistory, PurchaseHistoryAdmin)
+
+class TryOnHistoryAdmin(admin.ModelAdmin):
+    list_display = ('user', 'try_on_date', 'person_image_url', 'outfit_image_url', 'result_image_url')
+    search_fields = ('user__email',)
+    readonly_fields = ('try_on_date', 'user')
+
+admin.site.register(TryOnHistory, TryOnHistoryAdmin)

@@ -87,7 +87,7 @@ def edit_user(request, user_id):
         subscription_id = request.POST.get('subscription')
         role = request.POST.get('role')
 
-
+        print(attempt)
         try:
             # Update user fields
             user.first_name = first_name
@@ -97,7 +97,7 @@ def edit_user(request, user_id):
             # Update profile fields
             profile = user.profile
             profile.phone = phone
-            profile.attempt = attempt
+            profile.attempts = attempt
             if subscription_id:
                 profile.subscription = Subscription.objects.get(id=subscription_id)
             

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
-{% block title %}Profile{% endblock %}
+{% block title %}Try On History{% endblock %}
 {% block content %}
 <style>
     .profile-container {
@@ -100,19 +100,14 @@
         border-bottom: 1px solid #dee2e6;
         padding-bottom: 10px;
     }
-    .tabs a, .tabs div {
-        text-decoration: none !important;
-        color: #333;
+    .tabs div {
         font-weight: 500;
-        font-size: 1.1rem;
-        padding: 10px 24px;
-        border-radius: 8px 8px 0 0;
-        background: none;
-        transition: background 0.2s, color 0.2s;
         cursor: pointer;
-        border-bottom: 2px solid transparent;
+        padding: 10px 0;
+        color: #6c757d;
+        transition: all 0.3s ease;
     }
-    .tabs a:hover div, .tabs div:hover {
+    .tabs div:hover {
         color: #0d6efd;
     }
     .tabs .active {
@@ -252,15 +247,15 @@
             {% csrf_token %}
             <div class="avatar-container">
                 {% if user.profile.avatar %}
-                    <img src="{{ user.profile.avatar.url }}" alt="Avatar" onclick="showImagePreview(this.src)">
+                    <img src="{{ user.profile.avatar.url }}" alt="Avatar" onclick="showImagePreview(this.src, 'profile')">
                 {% else %}
                     <img src="https://i.pravatar.cc/100" alt="Avatar">
                 {% endif %}
                 <div class="upload-overlay">
                     <div class="d-flex flex-column gap-2">
-                        <span onclick="document.getElementById('avatar').click()">Change</span>
+                        <!-- <span onclick="document.getElementById('avatar').click()">Change</span> -->
                         {% if user.profile.avatar %}
-                            <span onclick="showImagePreview('{{ user.profile.avatar.url }}')">View</span>
+                            <span onclick="showImagePreview('{{ user.profile.avatar.url }}', 'profile')">View</span>
                         {% endif %}
                     </div>
                 </div>
@@ -268,9 +263,10 @@
             </div>
         </form>
         <h2>{{ user.get_full_name|default:user.email }}</h2>
-        <a class="active" href="{% url 'user:profile' %}">Profile</a>
+        <a href="{% url 'user:profile' %}">Profile</a>
         <a href="{% url 'user:purchase_history' %}">Purchase history</a>
-        <a href="{% url 'user:try_on_history' %}">Try On history</a>
+        <a class="active"href="{% url 'user:try_on_history' %}">Try On history</a>
+        
     </div>
 
     <div class="main-content">
@@ -284,68 +280,73 @@
         </div>
         {% endif %}
 
-        <div class="tabs">
-            <a href="{% url 'user:profile' %}"><div class="active">Account Setting</div></a>
-            <a href="{% url 'user:security' %}"><div>Login & Security</div></a>
-            <a href="#"><div>Notifications</div></a>
-        </div>
-
-        <div class="subscription-info">
-            <h3>Current Subscription</h3>
-            <p><strong>Plan:</strong> {{ user.profile.subscription.name }} Plan</p>
-            <p><strong>Expires:</strong> {{ user.profile.expired_date|date:"d/m/Y" }}</p>
-            <p><strong>Duration:</strong> 
-            {% with user.profile.expired_date|days_left as days %}
-                <span class="{% if days == 0 %}text-danger{% elif days <= 3 %}text-warning{% else %}text-success{% endif %} {% if days <= 3 %}fw-bold{% endif %}">
-                    {{ days|default:"Expired" }} {% if days > 0 %}days{% endif %}
-                </span>
-            {% endwith %}
-            </p>
-        </div>
-
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Full name</label>
-                    <input type="text" name="full_name" value="{{ user.get_full_name }}" placeholder="Please enter your full name">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" value="{{ user.email }}" disabled>
-                </div>
-                <div class="form-group">
-                    <label>Phone number</label>
-                    <input type="tel" name="phone" value="{{ user.profile.phone|default:'' }}" placeholder="+84 Please enter your phone number">
-                </div>
-                <div class="form-group">
-                    <label>Attempts</label>
-                    {% if user.profile.subscription.name == 'Free' %}
-                        <input type="number" name="attempts" value="{{ user.profile.attempts|default:20 }}" disabled>
-                    {% else %}
-                        <input type="text" name="attempts" value="&infin;" disabled>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="actions">
-                <button type="submit" class="btn btn-primary">Save Profile</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
-            </div>
-        </form>
+        <h3 style="margin-bottom: 20px; border-bottom: 1px solid #dee2e6; padding-bottom: 10px;" class='text-center'>Try On History</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">STT</th>
+                    <th style="text-align: center;">Person</th>
+                    <th style="text-align: center;">Outfit</th>
+                    <th style="text-align: center;">Result</th>
+                    <th style="text-align: center;">Try On Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for try_on in all_try_on %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td style="text-align: center;">
+                        <a href="{{ try_on.person_image_url }}" target="_blank">
+                            <img src="{{ try_on.person_image_url }}" alt="Person Image" style="width: 150px; height: 150px;">
+                        </a>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{{ try_on.outfit_image_url }}" target="_blank">
+                            <img src="{{ try_on.outfit_image_url }}" alt="Outfit Image" style="width: 150px; height: 150px;">
+                        </a>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{{ try_on.result_image_url }}" target="_blank">
+                            <img src="{{ try_on.result_image_url }}" alt="Result Image" style="width: 150px; height: 150px;">
+                        </a>
+                    </td>
+                    <td>{{ try_on.try_on_date|date:'d/m/Y H:i' }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No try on history</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Image Preview Modal -->
-<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+<!-- Profile Image Preview Modal -->
+<div class="modal fade" id="profileImagePreviewModal" tabindex="-1" aria-labelledby="profileImagePreviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="imagePreviewModalLabel">Profile Photo</h5>
+                <h5 class="modal-title" id="profileImagePreviewModalLabel">Profile Photo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-                <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 80vh;">
+                <img id="profilePreviewImage" src="" alt="Preview" style="max-width: 100%; max-height: 80vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Image Preview Modal -->
+<div class="modal fade" id="paymentImagePreviewModal" tabindex="-1" aria-labelledby="paymentImagePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentImagePreviewModalLabel">Payment Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="paymentPreviewImage" src="" alt="Preview" style="max-width: 100%; max-height: 80vh;">
             </div>
         </div>
     </div>
@@ -363,10 +364,17 @@ function updateAvatar(input) {
     }
 }
 
-function showImagePreview(imageUrl) {
-    document.getElementById('previewImage').src = imageUrl;
-    var modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-    modal.show();
+function showImagePreview(imageUrl, type, transactionId = null) {
+    if(type === 'profile') {
+        document.getElementById('profilePreviewImage').src = imageUrl;
+        var modal = new bootstrap.Modal(document.getElementById('profileImagePreviewModal'));
+        modal.show();
+    } else if(type === 'payment') {
+        document.getElementById('paymentPreviewImage').src = imageUrl;
+        document.getElementById('paymentImagePreviewModalLabel').textContent = transactionId;
+        var modal = new bootstrap.Modal(document.getElementById('paymentImagePreviewModal'));
+        modal.show();
+    }
 }
 </script>
 {% endblock %}

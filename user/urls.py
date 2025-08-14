@@ -15,4 +15,5 @@ urlpatterns = [
     path('security/', views.security, name='security'),
     path('purchase-history/', views.purchase_history, name='purchase_history'),
     path('payment/<int:subscription_id>/', views.payment, name='payment'),
+    path('try-on-history/', views.try_on_history, name='try_on_history'),
 ]
