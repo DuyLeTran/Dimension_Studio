@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from user.models import Subscription, TryOnHistory
 from AI.api_client import API_Client
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     return render(request, 'home.html')
@@ -17,7 +18,7 @@ def pricing(request):
 def how_it_works(request):
     return render(request, 'how_it_work.html')
 
-
+@login_required
 def try_on(request):
     attempts = request.user.profile.attempts
     subscription = request.user.profile.subscription
